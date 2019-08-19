@@ -1,0 +1,32 @@
+#!/bin/bash
+# Enter the XENONnT (singularity + conda) environment on dali/midway
+
+if [ -z "$1" ]
+then
+      ARGUMENT1='-j'
+else
+      ARGUMENT1=$1
+fi
+
+if [ -z "$2" ]
+then
+      ARGUMENT2='osgvo-xenon:latest'
+else
+      ARGUMENT2=$2
+fi
+
+
+INNER_SCRIPT="/project2/lgrandi/xenonnt/development/_xentenv_inner_test.sh $ARGUMENT1"
+CONTAINER_NAME=$ARGUMENT2
+CONTAINER_PATH=/cvmfs/singularity.opensciencegrid.org/opensciencegrid
+SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
+
+echo "Loading singularity"
+module load singularity/3.0.1
+
+echo "Container build info:"
+cat $CONTAINER_PATH/$CONTAINER_NAME/image-build-info.txt
+
+echo "Loading $CONTAINER_NAME"
+singularity exec --bind /cvmfs/ --bind /project/ --bind /project2/ --bind /scratch/midway2/$USER --bind /dali $CONTAINER_PATH/$CONTAINER_NAME $INNER_SCRIPT
+
