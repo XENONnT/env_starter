@@ -34,6 +34,7 @@ export GFAL_PLUGIN_DIR=$CONDA_PREFIX/lib64/gfal2-plugins/
 # rucio
 export RUCIO_HOME=$CONDA_PREFIX
 export RUCIO_ACCOUNT=xenon-analysis
+export X509_USER_PROXY=/project/lgrandi/xenon1t/grid_proxy/xenon_service_proxy
 if [ "x$X509_CERT_DIR" = "x" ]; then
     export X509_CERT_DIR=/etc/grid-security/certificates
 fi

@@ -16,6 +16,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--copy_tutorials', 
     action='store_true',
     help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
+parser.add_argument('--partition',
+    default='dali', type=str,
+    help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
 parser.add_argument('--timeout', 
     default=120, type=int,
     help='Seconds to wait for the jupyter server to start')
@@ -76,9 +79,9 @@ module load cuda/9.1
 """
 
 cpu_header = """\
-#SBATCH --qos dali
-#SBATCH --partition dali
-"""
+#SBATCH --qos {partition}
+#SBATCH --partition {partition}
+""".format(partition=args.partition)
 
 
 
