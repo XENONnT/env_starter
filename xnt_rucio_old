@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #Configuration to the Rucio server 1.8.5.post1
 export RUCIO_HOME=/cvmfs/xenon.opensciencegrid.org/software/rucio-py27/1.8.3/rucio
 export RUCIO_ACCOUNT=xenon-analysis

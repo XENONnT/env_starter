@@ -32,9 +32,10 @@ export GFAL_CONFIG_DIR=$CONDA_PREFIX/etc/gfal2.d
 export GFAL_PLUGIN_DIR=$CONDA_PREFIX/lib64/gfal2-plugins/
 
 # rucio
-export RUCIO_HOME=$CONDA_PREFIX
+#export RUCIO_HOME=$CONDA_PREFIX  #developer Rucio catalogue
+export RUCIO_HOME=/cvmfs/xenon.opensciencegrid.org/software/rucio-py27/1.8.3/rucio #production catalogue
 export RUCIO_ACCOUNT=xenon-analysis
-export X509_USER_PROXY=/project/lgrandi/xenon1t/grid_proxy/xenon_service_proxy
+export X509_USER_PROXY=/project2/lgrandi/grid_proxy/xenon_service_proxy
 if [ "x$X509_CERT_DIR" = "x" ]; then
     export X509_CERT_DIR=/etc/grid-security/certificates
 fi
