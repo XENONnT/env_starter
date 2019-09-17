@@ -81,6 +81,7 @@ module load cuda/9.1
 cpu_header = """\
 #SBATCH --qos {partition}
 #SBATCH --partition {partition}
+#SBATCH --reservation=xenon_notebook
 """.format(partition=args.partition)
 
 
