@@ -17,13 +17,13 @@ parser.add_argument('--copy_tutorials',
     action='store_true',
     help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
 parser.add_argument('--partition',
-    default='dali', type=str,
+    default='xenon1t', type=str,
     help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
 parser.add_argument('--timeout', 
     default=120, type=int,
     help='Seconds to wait for the jupyter server to start')
 parser.add_argument('--cpu', 
-    default=4, type=int, 
+    default=1, type=int, 
     help='Number of CPUs to request.')
 parser.add_argument('--jelle_conda', 
     action='store_true', default=False,
