@@ -60,7 +60,7 @@ if [[ $1 = "-j" ]]; then
         JUP_HOST=localhost
     fi    
     echo "Starting jupyter server on host $JUP_HOST, port $JUP_PORT"
-    jupyter notebook --config /project2/lgrandi/xenonnt/development/jupyter_notebook_config.py --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
+    jupyter lab --config /project2/lgrandi/xenonnt/development/jupyter_notebook_config.py --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
 else
     export PS1="[nT \u@\h \W]\$ "
     bash
