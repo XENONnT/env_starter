@@ -25,9 +25,10 @@ parser.add_argument('--timeout',
 parser.add_argument('--cpu', 
     default=1, type=int, 
     help='Number of CPUs to request.')
-parser.add_argument('--jelle_conda', 
-    action='store_true', default=False,
-    help="Use Jelle's personal anaconda instead of whichever conda is default for you.")
+parser.add_argument('--conda_path', 
+    default='<INFER>',
+    help="For non-singularity environments, path to conda binary to use."
+         "Default is to infer this from running 'which conda'.")
 parser.add_argument('--gpu', 
     action='store_true', default=False,
     help='Request to run on a GPU partition. Limits runtime to 2 hours.')
@@ -109,15 +110,16 @@ JUP_HOST=$(hostname -i)
 if args.env == 'nt_singularity':
     jupyter_job += '/project2/lgrandi/xenonnt/development/xnt_env -j {s_container}'.format(s_container=s_container)
 else:
-    if args.jelle_conda:
-        conda_path = '/home/aalbers/miniconda3/bin/conda'
-    else:
+    if args.conda_path == '<INFER>':
+        print("Autoinferring conda path")
         conda_path = subprocess.check_output(['which', 'conda']).strip()
         conda_path = conda_path.decode()
+    else:
+        conda_path = args.conda_path
 
     conda_dir = os.path.dirname(conda_path)
     conda_dir = os.path.abspath(os.path.join(conda_dir, os.pardir))
-    print("The conda dir is %s. At least I hope so." % conda_dir)
+    print("Using conda from %s instead of singularity container." % conda_dir)
 
     jupyter_job += _start_jupyter.format(
         conda_dir=conda_dir,
@@ -135,7 +137,7 @@ def make_executable(path):
     mode |= (mode & 0o444) >> 2    # copy R bits to X
     os.chmod(path, mode)
     
-    
+
 url_cache_fn = osp.join(
     os.environ['HOME'],
     '.last_jupyter_url')
@@ -144,7 +146,7 @@ username = os.environ['USER']
 q = subprocess.check_output(['squeue', '-u', username])
 for line in q.decode().splitlines():
     if 'straxlab' in line:
-        print("You still have a running jupyter job; retrieving the URL.")
+        print("You still have a running jupyter job, trying to retrieve the URL.")
         job_id = int(line.split()[0])
         with open(url_cache_fn) as f:
             url = f.read()
