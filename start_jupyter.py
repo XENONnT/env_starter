@@ -25,6 +25,9 @@ parser.add_argument('--timeout',
 parser.add_argument('--cpu', 
     default=1, type=int, 
     help='Number of CPUs to request.')
+parser.add_argument('--ram',
+    default=4480, type=int,
+    help='MB of RAM to request')
 parser.add_argument('--conda_path', 
     default='<INFER>',
     help="For non-singularity environments, path to conda binary to use."
@@ -64,7 +67,7 @@ jupyter_job = """#!/bin/bash
 #SBATCH --account=pi-lgrandi
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task={n_cpu}
-#SBATCH --mem-per-cpu=4480
+#SBATCH --mem-per-cpu={mem_per_cpu}
 #SBATCH --time={max_hours}:00:00
 {extra_header}
 
@@ -163,7 +166,8 @@ else:
             log_fn=log_fn,
             max_hours=2 if args.gpu else 24,
             extra_header=gpu_header if args.gpu else cpu_header,
-            n_cpu=n_cpu))
+            n_cpu=n_cpu,
+            mem_per_cpu=int(args.ram/n_cpu)))
     make_executable(job_fn)
     result = subprocess.check_output(['sbatch', job_fn])
     job_id = int(result.decode().split()[-1])
