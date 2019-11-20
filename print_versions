@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+print("Welcome XENON analyst! Testing your software versions now.")
+
+##
+# Printing out current python / strax / straxen locations
+##
+
+import sys
+import platform
+from os.path import dirname
+
+print("\tPython %s at %s" % (platform.python_version(), sys.executable))
+
+try:
+    import strax
+except:
+    print("Strax did not import!")
+    raise
+
+print("\tStrax %s at %s" % (strax.__version__, dirname(strax.__file__)))
+
+try:
+    import straxen
+except:
+    print("Straxen did not import!")
+    raise
+    
+print("\tStraxen %s at %s" % (straxen.__version__, dirname(straxen.__file__)))

@@ -1,3 +1,0 @@
-export RUCIO_HOME=$CONDA_PREFIX 
-export RUCIO_ACCOUNT=xenon-analysis
-export X509_USER_PROXY=/home/bauermeister/proxy_xenon/x509up_own

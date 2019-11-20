@@ -1,6 +1,4 @@
 #!/bin/bash
-DEV_PYDIR=/project2/lgrandi/xenonnt/development
-
 echo "Clearing environment variables"
 unset PYTHONPATH
 for VAR in X509_CERT_DIR X509_VOMS_DIR; do
@@ -23,10 +21,6 @@ echo "Setting environment variables"
 # Why is this necessary? shouldn't conda do it?
 export LD_LIBRARY_PATH=$CONDA_PREFIX/lib64${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 
-# Development python packages
-export PYTHONPATH=$DEV_PYDIR/lib/python3.6/site-packages:$PYTHONPATH
-export PATH=$DEV_PYDIR/bin:$PATH
-
 # gfal2
 export GFAL_CONFIG_DIR=$CONDA_PREFIX/etc/gfal2.d
 export GFAL_PLUGIN_DIR=$CONDA_PREFIX/lib64/gfal2-plugins/
@@ -41,13 +35,11 @@ if [ "x$X509_CERT_DIR" = "x" ]; then
 fi
 
 # stuff
-#alias py_dev_install='python setup.py develop --prefix=$DEV_PYDIR'
 alias llt='ls -ltrh'
 alias la='ls -a'
 alias ll='ls -la'
 
-echo "Testing strax/straxen import"
-python -c 'import strax; import straxen; [print(f"{x.__name__} {x.__version__}") for x in [strax, straxen]]'
+/project2/lgrandi/xenonnt/development/print_versions
 
 # Start the shell or jupyter server
 if [[ $1 = "-j" ]]; then
