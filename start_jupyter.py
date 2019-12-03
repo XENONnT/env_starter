@@ -56,7 +56,7 @@ if args.copy_tutorials:
         print("NOT copying tutorials, folder already exists")
     else:
         shutil.copytree(
-            '/project2/lgrandi/xenonnt/development/straxen/notebooks/tutorials',
+            '/home/aalbers/xnt_devdir/straxen_for_tutorials/straxen/notebooks/tutorials',
             dest)
 
 
