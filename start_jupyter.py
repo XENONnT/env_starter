@@ -17,7 +17,7 @@ parser.add_argument('--partition',
     default='xenon1t', type=str,
     help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
 parser.add_argument('--timeout', 
-    default=600, type=int,
+    default=120, type=int,
     help='Seconds to wait for the jupyter server to start')
 parser.add_argument('--cpu', 
     default=1, type=int, 
@@ -207,7 +207,7 @@ else:
                     printflush("\n")
                     t_last_cat = time.time()
 
-                time.sleep(2)
+                time.sleep(5)
                 slept += 2
     if url is None:
         with open(log_fn, mode='r') as f:

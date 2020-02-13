@@ -58,7 +58,7 @@ then
 fi
 echo "INNER_SCRIPT = ${INNER_SCRIPT}"
 
-CONTAINER_PATH="library://rynge/default"
+CONTAINER_PATH="/cvmfs/singularity.opensciencegrid.org/opensciencegrid"
 
 SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
 
