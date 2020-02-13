@@ -8,6 +8,9 @@ import sys
 import tempfile
 import time
 
+# for development, in case the env_starter repo is not in standard location
+ENVSTARTER_PATH = '/project2/lgrandi/xenonnt/development'
+
 parser = argparse.ArgumentParser(
     description='Start a strax jupyter notebook server on the dali batch queue')
 parser.add_argument('--copy_tutorials', 
@@ -39,7 +42,7 @@ parser.add_argument('--env',
          'Other arguments are passed to "conda activate" '
          "(and don't load a container).")
 parser.add_argument('--container', 
-    default='osgvo-xenon:latest',
+    default='/project2/lgrandi/xenonnt/singularity-images/xenonnt-development.simg',
     help='Singularity container to load'
          'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
          'Default container: "latest"')
@@ -115,7 +118,8 @@ JUP_HOST=$(hostname -i)
 """
 
 if args.env == 'nt_singularity':
-    jupyter_job += '/project2/lgrandi/xenonnt/development/xnt_env -j {s_container}'.format(s_container=s_container)
+    jupyter_job += '{envstarter}/xnt_env -j {s_container}'.format(envstarter=ENVSTARTER_PATH,
+                                                                  s_container=s_container)
 else:
     if args.conda_path == '<INFER>':
         printflush("Autoinferring conda path")

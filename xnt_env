@@ -8,6 +8,9 @@
 # https://stackoverflow.com/questions/192249/
 ##
 
+# for development in case the env_starter repo is not the main one
+ENVSTARTER_PATH='/project2/lgrandi/xenonnt/development'
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -28,7 +31,7 @@ case $key in
     ;;
 
     -n|--container)
-    CONTAINER_NAME="$2"
+    CONTAINER_PATH="$2"
     shift # past argument
     shift # past value
     ;;
@@ -41,24 +44,22 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ -z "$CONTAINER_NAME" ]
+if [ -z "$CONTAINER_PATH" ]
 then 
     echo "Container name not given, using latest container"
-    CONTAINER_NAME="osgvo-xenon:latest"
+    CONTAINER_PATH="/project2/lgrandi/xenonnt/singularity-images/xenonnt-development.simg"
 fi
 
 echo "JUPYTER = ${JUPYTER}"
 echo "PORT = ${PORT}"
 echo "CONTAINERNAME = ${CONTAINER_NAME}"
 
-INNER_SCRIPT="/project2/lgrandi/xenonnt/development/_xentenv_inner.sh"
+INNER_SCRIPT="${ENVSTARTER_PATH}/_xentenv_inner.sh"
 if [ ! -z "$JUPYTER" ]
 then
     INNER_SCRIPT="${INNER_SCRIPT} -j ${PORT}"
 fi
 echo "INNER_SCRIPT = ${INNER_SCRIPT}"
-
-CONTAINER_PATH="/cvmfs/singularity.opensciencegrid.org/opensciencegrid"
 
 SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
 
@@ -66,8 +67,8 @@ echo "Loading singularity"
 module load singularity
 
 echo "Container build info:"
-cat $CONTAINER_PATH/$CONTAINER_NAME/image-build-info.txt
+cat $CONTAINER_PATH/image-build-info.txt
 
 echo "Loading $CONTAINER_NAME"
 
-singularity exec --bind /cvmfs/ --bind /project/ --bind /project2/ --bind /scratch/midway2/$USER --bind /dali $CONTAINER_PATH/$CONTAINER_NAME $INNER_SCRIPT
+singularity exec --bind /cvmfs/ --bind /project/ --bind /project2/ --bind /scratch/midway2/$USER --bind /dali $CONTAINER_PATH $INNER_SCRIPT
