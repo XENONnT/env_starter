@@ -197,7 +197,7 @@ else:
             else:
                 printflush(
                     "Waiting for jupyter server to start inside job. "
-                    "%d seconds until we give up" % (slept - args.timeout))
+                    "%d seconds until we give up" % (args.timeout - slept))
 
                 t_since_cat = time.time() - t_last_cat
                 if t_since_cat > 20:

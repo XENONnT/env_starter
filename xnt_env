@@ -44,7 +44,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 if [ -z "$CONTAINER_NAME" ]
 then 
     echo "Container name not given, using latest container"
-    CONTAINER_NAME="xenonnt:development"
+    CONTAINER_NAME="osgvo-xenon:latest"
 fi
 
 echo "JUPYTER = ${JUPYTER}"
