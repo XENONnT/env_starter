@@ -17,7 +17,7 @@ parser.add_argument('--partition',
     default='xenon1t', type=str,
     help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
 parser.add_argument('--timeout', 
-    default=120, type=int,
+    default=600, type=int,
     help='Seconds to wait for the jupyter server to start')
 parser.add_argument('--cpu', 
     default=1, type=int, 
@@ -179,20 +179,34 @@ else:
     job_id = int(result.decode().split()[-1])
 
     printflush("Starting to look for logfile %s" % log_fn)
+
     while not osp.exists(log_fn):
-        printflush("Waiting for your job to start...")
+        printflush("Waiting for your job to start (potentially forever)...")
         time.sleep(1)
 
+    t_last_cat = 0
     slept = 0
     url = None
     while url is None and slept < args.timeout:
         with open(log_fn, mode='r') as f:
-            for line in f.readlines():
-                if 'http' in line:
+            content = f.readlines()
+            for line in content:
+                if 'http' in line and not 'sylabs' in line:
                     url = line.split()[-1]
                     break
             else:
-                printflush("Waiting for jupyter server to start inside job...")
+                printflush(
+                    "Waiting for jupyter server to start inside job. "
+                    "%d seconds until we give up" % (slept - args.timeout))
+
+                t_since_cat = time.time() - t_last_cat
+                if t_since_cat > 20:
+                    print("Log file currently contains:")
+                    for line in content:
+                        print(line)
+                    printflush("\n")
+                    t_last_cat = time.time()
+
                 time.sleep(2)
                 slept += 2
     if url is None:
