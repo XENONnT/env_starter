@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
-import tempfile
-import time
+import os
 import os.path as osp
 import shutil
-
-import random
-import string
-import os
 import subprocess
+import tempfile
+import time
 
 parser = argparse.ArgumentParser(
     description='Start a strax jupyter notebook server on the dali batch queue')
@@ -56,7 +53,7 @@ if args.copy_tutorials:
         print("NOT copying tutorials, folder already exists")
     else:
         shutil.copytree(
-            '/home/aalbers/xnt_devdir/straxen_for_tutorials/straxen/notebooks/tutorials',
+            '/dali/lgrandi/strax/straxen/notebooks/tutorials',
             dest)
 
 
@@ -169,9 +166,12 @@ else:
             n_cpu=n_cpu,
             mem_per_cpu=int(args.ram/n_cpu)))
     make_executable(job_fn)
+    print("Sumbitting sbatch %s" % job_fn)
     result = subprocess.check_output(['sbatch', job_fn])
+    print("sbatch returned %s" % result)
     job_id = int(result.decode().split()[-1])
-    
+
+    print("Starting to look for logfile %s" % log_fn)
     while not osp.exists(log_fn):
         print("Waiting for your job to start...")
         time.sleep(1)
@@ -193,15 +193,13 @@ else:
             content = f.read()
         raise RuntimeError("Jupyter did not start inside your job. Dumping job logfile {log_fn}:\n\n{content}".format(
             log_fn=log_fn,
-            content=content,
-        ))
+            content=content))
     
     with open(url_cache_fn, mode='w') as f:
         f.write(url)
     print("Dumped URL %s to cache file" % url)
-    os.remove(job_fn)
-    os.remove(log_fn)
 
+print("Parsing URL %s" % url)
 ip, port = url.split('/')[2].split(':')
 if 'token' in url:
     token = url.split('?')[1].split('=')[1]
@@ -212,11 +210,11 @@ else:
 print("""
 Success! If you have linux, execute the following command on your laptop:
 
-ssh -fN -L {port}:{ip}:{port} {username}@dali-login1.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
+ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
 
 If you have a mac, instead do:
 
-ssh -fN -L {port}:{ip}:{port} {username}@dali-login1.rcc.uchicago.edu && open http://localhost:{port}/{token}
+ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open http://localhost:{port}/{token}
 
-Happy strax analysis!
+Happy strax analysis, {username}!
 """.format(ip=ip, port=port, token=token, username=username))
