@@ -1,15 +1,8 @@
 #!/bin/bash
-echo "Clearing environment variables"
-unset PYTHONPATH
-for VAR in X509_CERT_DIR X509_VOMS_DIR; do
-    VALUE=${!VAR}
-    if [ "X$VALUE" != "X" ]; then
-        echo "WARNING: $VAR is set set and could lead to problems when using this environment"
-    fi
-done
 
 echo "Activating conda environment"
-source /opt/XENONnT/anaconda/bin/activate XENONnT_development
+source /opt/XENONnT/setup.sh
+
 which conda
 conda --version
 which python
@@ -17,27 +10,7 @@ python --version
 
 echo "Setting environment variables"
 
-# prepend to LD_LIBRARY_PATH - non-Python tools might be using it
-# Why is this necessary? shouldn't conda do it?
-export LD_LIBRARY_PATH=$CONDA_PREFIX/lib64${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
-
-# gfal2
-export GFAL_CONFIG_DIR=$CONDA_PREFIX/etc/gfal2.d
-export GFAL_PLUGIN_DIR=$CONDA_PREFIX/lib64/gfal2-plugins/
-
-# rucio
-#export RUCIO_HOME=$CONDA_PREFIX  #developer Rucio catalogue
-export RUCIO_HOME=/cvmfs/xenon.opensciencegrid.org/software/rucio-py27/1.8.3/rucio #production catalogue
-export RUCIO_ACCOUNT=xenon-analysis
 export X509_USER_PROXY=/project2/lgrandi/grid_proxy/xenon_service_proxy
-if [ "x$X509_CERT_DIR" = "x" ]; then
-    export X509_CERT_DIR=/etc/grid-security/certificates
-fi
-
-# stuff
-alias llt='ls -ltrh'
-alias la='ls -a'
-alias ll='ls -la'
 
 /project2/lgrandi/xenonnt/development/print_versions
 
