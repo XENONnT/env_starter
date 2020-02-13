@@ -203,7 +203,7 @@ else:
                 if t_since_cat > 20:
                     print("Log file currently contains:")
                     for line in content:
-                        print(line)
+                        print(line.rstrip())
                     printflush("\n")
                     t_last_cat = time.time()
 
