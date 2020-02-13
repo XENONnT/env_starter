@@ -70,6 +70,4 @@ cat $CONTAINER_PATH/$CONTAINER_NAME/image-build-info.txt
 
 echo "Loading $CONTAINER_NAME"
 
-echo "singularity exec --bind /cvmfs/ --bind /project/ --bind /project2/ --bind /scratch/midway2/$USER --bind /dali $CONTAINER_PATH/$CONTAINER_NAME $INNER_SCRIPT"
-
 singularity exec --bind /cvmfs/ --bind /project/ --bind /project2/ --bind /scratch/midway2/$USER --bind /dali $CONTAINER_PATH/$CONTAINER_NAME $INNER_SCRIPT
