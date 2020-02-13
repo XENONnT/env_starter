@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
 import argparse
 import os
 import os.path as osp
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -47,10 +47,17 @@ args = parser.parse_args()
 n_cpu = args.cpu
 s_container = args.container
 
+
+def printflush(x):
+    """Does print(x, flush=True), also in python 2.x"""
+    print(x)
+    sys.stdout.flush()
+
+
 if args.copy_tutorials:
     dest = osp.expanduser('~/strax_tutorials')
     if osp.exists(dest):
-        print("NOT copying tutorials, folder already exists")
+        printflush("NOT copying tutorials, folder already exists")
     else:
         shutil.copytree(
             '/dali/lgrandi/strax/straxen/notebooks/tutorials',
@@ -111,7 +118,7 @@ if args.env == 'nt_singularity':
     jupyter_job += '/project2/lgrandi/xenonnt/development/xnt_env -j {s_container}'.format(s_container=s_container)
 else:
     if args.conda_path == '<INFER>':
-        print("Autoinferring conda path")
+        printflush("Autoinferring conda path")
         conda_path = subprocess.check_output(['which', 'conda']).strip()
         conda_path = conda_path.decode()
     else:
@@ -119,7 +126,7 @@ else:
 
     conda_dir = os.path.dirname(conda_path)
     conda_dir = os.path.abspath(os.path.join(conda_dir, os.pardir))
-    print("Using conda from %s instead of singularity container." % conda_dir)
+    printflush("Using conda from %s instead of singularity container." % conda_dir)
 
     jupyter_job += _start_jupyter.format(
         conda_dir=conda_dir,
@@ -146,14 +153,14 @@ username = os.environ['USER']
 q = subprocess.check_output(['squeue', '-u', username])
 for line in q.decode().splitlines():
     if 'straxlab' in line:
-        print("You still have a running jupyter job, trying to retrieve the URL.")
+        printflush("You still have a running jupyter job, trying to retrieve the URL.")
         job_id = int(line.split()[0])
         with open(url_cache_fn) as f:
             url = f.read()
         break
         
 else:
-    print("Submitting a new jupyter job")
+    printflush("Submitting a new jupyter job")
     job_fn = tempfile.NamedTemporaryFile(
         delete=False, dir=tmp_dir).name
     log_fn = tempfile.NamedTemporaryFile(
@@ -166,14 +173,14 @@ else:
             n_cpu=n_cpu,
             mem_per_cpu=int(args.ram/n_cpu)))
     make_executable(job_fn)
-    print("Sumbitting sbatch %s" % job_fn)
+    printflush("Sumbitting sbatch %s" % job_fn)
     result = subprocess.check_output(['sbatch', job_fn])
-    print("sbatch returned %s" % result)
+    printflush("sbatch returned %s" % result)
     job_id = int(result.decode().split()[-1])
 
-    print("Starting to look for logfile %s" % log_fn)
+    printflush("Starting to look for logfile %s" % log_fn)
     while not osp.exists(log_fn):
-        print("Waiting for your job to start...")
+        printflush("Waiting for your job to start...")
         time.sleep(1)
 
     slept = 0
@@ -185,7 +192,7 @@ else:
                     url = line.split()[-1]
                     break
             else:
-                print("Waiting for jupyter server to start inside job...")
+                printflush("Waiting for jupyter server to start inside job...")
                 time.sleep(2)
                 slept += 2
     if url is None:
@@ -197,9 +204,9 @@ else:
     
     with open(url_cache_fn, mode='w') as f:
         f.write(url)
-    print("Dumped URL %s to cache file" % url)
+    printflush("Dumped URL %s to cache file" % url)
 
-print("Parsing URL %s" % url)
+printflush("Parsing URL %s" % url)
 ip, port = url.split('/')[2].split(':')
 if 'token' in url:
     token = url.split('?')[1].split('=')[1]
@@ -207,7 +214,7 @@ if 'token' in url:
 else:
     token = ''
 
-print("""
+printflush("""
 Success! If you have linux, execute the following command on your laptop:
 
 ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
