@@ -176,6 +176,8 @@ def main():
             job_id = int(line.split()[0])
             print_flush("You still have a running job with id %d!" % job_id)
             print_flush("\tTrying to retrieve the URL from " + url_cache_fn)
+            print_flush("\tIf it doesn't work, login and cancel your job "
+                        "so we can start a new one.")
             with open(url_cache_fn) as f:
                 url = f.read()
             break
@@ -236,8 +238,7 @@ def main():
         with open(url_cache_fn, mode='w') as f:
             f.write(url)
         # The token is in the file, so we had better do...
-        os.chmod(url_cache_fn, stat.S_IREAD)
-        os.chmod(url_cache_fn, stat.S_IWRITE)
+        os.chmod(url_cache_fn, stat.S_IRWXU)
 
     print_flush("\tParsing URL %s" % url)
     ip, port = url.split('/')[2].split(':')
