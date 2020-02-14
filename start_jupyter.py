@@ -68,7 +68,7 @@ JUP_HOST=$(hostname -i)
 """
 
 SUCCESS_MESSAGE = """
-Success! If you have linux, execute the following command on your laptop:
+All done! If you have linux, execute this command on your laptop:
 
 ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
 
@@ -229,11 +229,13 @@ def main():
         if url is None:
             raise RuntimeError("Jupyter did not start inside your job!")
 
+        print_flush("\nJupyter started succesfully")
+
+        print_flush("\tDumping URL %s to cache file %s" % (url, url_cache_fn))
         with open(url_cache_fn, mode='w') as f:
             f.write(url)
-        print_flush("\nJupyter started! Dumped URL %s to cache file" % url)
 
-    print_flush("Parsing URL %s" % url)
+    print_flush("\tParsing URL %s" % url)
     ip, port = url.split('/')[2].split(':')
     if 'token' in url:
         token = url.split('?')[1].split('=')[1]
