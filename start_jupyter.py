@@ -4,6 +4,7 @@ import os
 import os.path as osp
 import shutil
 import subprocess
+import stat
 import sys
 import tempfile
 import time
@@ -234,6 +235,8 @@ def main():
         print_flush("\tDumping URL %s to cache file %s" % (url, url_cache_fn))
         with open(url_cache_fn, mode='w') as f:
             f.write(url)
+        # The token is in the file, so we had better do...
+        os.chmod(url_cache_fn, stat.S_IREAD)
 
     print_flush("\tParsing URL %s" % url)
     ip, port = url.split('/')[2].split(':')
