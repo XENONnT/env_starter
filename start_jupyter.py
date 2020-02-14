@@ -237,6 +237,7 @@ def main():
             f.write(url)
         # The token is in the file, so we had better do...
         os.chmod(url_cache_fn, stat.S_IREAD)
+        os.chmod(url_cache_fn, stat.S_IWRITE)
 
     print_flush("\tParsing URL %s" % url)
     ip, port = url.split('/')[2].split(':')
