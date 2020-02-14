@@ -173,8 +173,8 @@ def main():
     for line in q.decode().splitlines():
         if 'straxlab' in line:
             job_id = int(line.split()[0])
-            print_flush("You still have a running job with id %d, "
-                        "trying to retrieve the URL." % job_id)
+            print_flush("You still have a running job with id %d!" % job_id)
+            print_flush("\tTrying to retrieve the URL from " + url_cache_fn)
             with open(url_cache_fn) as f:
                 url = f.read()
             break
