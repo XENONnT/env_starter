@@ -8,6 +8,17 @@ import sys
 import tempfile
 import time
 
+SPLASH_SCREEN = r"""
+___   ___  _______ .__   __.   ______   .__   __. .__   __. .___________.
+\  \ /  / |   ____||  \ |  |  /  __  \  |  \ |  | |  \ |  | |           |
+ \  V  /  |  |__   |   \|  | |  |  |  | |   \|  | |   \|  | `---|  |----`
+  >   <   |   __|  |  . `  | |  |  |  | |  . `  | |  . `  |     |  |     
+ /  .  \  |  |____ |  |\   | |  `--'  | |  |\   | |  |\   |     |  |     
+/__/ \__\ |_______||__| \__|  \______/  |__| \__| |__| \__|     |__|     
+
+                University of Chicago analysis facility Midway / Dali
+
+"""
 
 JOB_HEADER = """#!/bin/bash
 #SBATCH --job-name=straxlab
@@ -119,6 +130,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
+    print_flush(SPLASH_SCREEN)
 
     if args.copy_tutorials:
         dest = osp.expanduser('~/strax_tutorials')
@@ -191,12 +203,13 @@ def main():
         print_flush("\tYou have job id %d" % job_id)
 
         print_flush("Waiting for your job to start")
-        print_flush("\tStarting to look for logfile %s" % log_fn)
+        print_flush("\tLooking for logfile %s" % log_fn)
         while not osp.exists(log_fn):
             print_flush("\tstill waiting...")
             time.sleep(2)
 
-        print_flush("Job started. Parsing logfile for jupyter url")
+        print_flush("Job started. Logfile is displayed below; "
+                    "we're looking for the jupyter URL.")
         lines_shown = 0
         slept = 0
         url = None
@@ -218,7 +231,7 @@ def main():
 
         with open(url_cache_fn, mode='w') as f:
             f.write(url)
-        print_flush("Jupyter started. Dumped URL %s to cache file" % url)
+        print_flush("\nJupyter started! Dumped URL %s to cache file" % url)
 
     print_flush("Parsing URL %s" % url)
     ip, port = url.split('/')[2].split(':')
