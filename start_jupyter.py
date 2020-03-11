@@ -126,9 +126,9 @@ def parse_arguments():
         help='Singularity container to load'
              'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
              'Default container: "latest"')
-    parser.add_argument('--parallel',
+    parser.add_argument('--force_new',
         action='store_true', default=False,
-        help='Start a new job in parallel with an old one.')
+        help='Start a new job even if you already have an old one running')
     return parser.parse_args()
 
 
@@ -167,6 +167,7 @@ def main():
             + START_JUPYTER.format(conda_dir=conda_dir,
                                    env_name=args.env))
 
+    url = None
     url_cache_fn = osp.join(
         os.environ['HOME'],
         '.last_jupyter_url')
@@ -175,7 +176,7 @@ def main():
     # Check if a job is already running
     q = subprocess.check_output(['squeue', '-u', username])
     for line in q.decode().splitlines():
-        if 'straxlab' in line and not args.parallel:
+        if 'straxlab' in line and not args.force_new:
             job_id = int(line.split()[0])
             print_flush("You still have a running job with id %d!" % job_id)
             print_flush("\tTrying to retrieve the URL from " + url_cache_fn)
@@ -185,6 +186,11 @@ def main():
                 for line_f in f:
                     if line_f.split()[0] == str(job_id):
                         url = line_f.split()[-1]
+                        break
+                else:
+                    print_flush("\t... Unfortunately the cache file refers "
+                                "to a different job. Too bad.")
+            if url is not None:
                 break
 
     else:
