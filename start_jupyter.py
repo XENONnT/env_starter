@@ -126,6 +126,9 @@ def parse_arguments():
         help='Singularity container to load'
              'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
              'Default container: "latest"')
+    parser.add_argument('--parallel',
+        action='store_true', default=False,
+        help='Start a new job in parallel with an old one.')
     return parser.parse_args()
 
 
@@ -168,19 +171,21 @@ def main():
         os.environ['HOME'],
         '.last_jupyter_url')
     username = os.environ['USER']
-
+    
     # Check if a job is already running
     q = subprocess.check_output(['squeue', '-u', username])
     for line in q.decode().splitlines():
-        if 'straxlab' in line:
+        if 'straxlab' in line and not args.parallel:
             job_id = int(line.split()[0])
             print_flush("You still have a running job with id %d!" % job_id)
             print_flush("\tTrying to retrieve the URL from " + url_cache_fn)
             print_flush("\tIf it doesn't work, login and cancel your job "
                         "so we can start a new one.")
             with open(url_cache_fn) as f:
-                url = f.read()
-            break
+                for line_f in f:
+                    if line_f.split()[0] == str(job_id):
+                        url = line_f.split()[-1]
+                break
 
     else:
         print_flush("Submitting a new jupyter job")
@@ -235,8 +240,8 @@ def main():
         print_flush("\nJupyter started succesfully")
 
         print_flush("\tDumping URL %s to cache file %s" % (url, url_cache_fn))
-        with open(url_cache_fn, mode='w') as f:
-            f.write(url)
+        with open(url_cache_fn, mode='a') as f:
+            f.write(str(job_id) + ' ' + url + '\n')
         # The token is in the file, so we had better do...
         os.chmod(url_cache_fn, stat.S_IRWXU)
 
