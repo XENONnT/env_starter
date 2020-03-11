@@ -183,13 +183,17 @@ def main():
             print_flush("\tIf it doesn't work, login and cancel your job "
                         "so we can start a new one.")
             with open(url_cache_fn) as f:
-                for line_f in f:
-                    if line_f.split()[0] == str(job_id):
-                        url = line_f.split()[-1]
-                        break
+                try:
+                    cached_job_id, cached_url = f.read().split()
+                except Exception as e:
+                    print_flush(f"\tProblem reading cache file! {e}")
+                    print_flush("\tWell, we can still start a new job...")
                 else:
-                    print_flush("\t... Unfortunately the cache file refers "
-                                "to a different job. Too bad.")
+                    if int(cached_job_id) == job_id:
+                        url = cached_url
+                    else:
+                        print_flush("\t... Unfortunately the cache file refers "
+                                    f"to a different job, id {cached_job_id}.")
             if url is not None:
                 break
 
@@ -246,7 +250,7 @@ def main():
         print_flush("\nJupyter started succesfully")
 
         print_flush("\tDumping URL %s to cache file %s" % (url, url_cache_fn))
-        with open(url_cache_fn, mode='a') as f:
+        with open(url_cache_fn, mode='w') as f:
             f.write(str(job_id) + ' ' + url + '\n')
         # The token is in the file, so we had better do...
         os.chmod(url_cache_fn, stat.S_IRWXU)
