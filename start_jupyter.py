@@ -186,14 +186,14 @@ def main():
                 try:
                     cached_job_id, cached_url = f.read().split()
                 except Exception as e:
-                    print_flush(f"\tProblem reading cache file! {e}")
+                    print_flush("\tProblem reading cache file! " + str(e))
                     print_flush("\tWell, we can still start a new job...")
                 else:
                     if int(cached_job_id) == job_id:
                         url = cached_url
                     else:
                         print_flush("\t... Unfortunately the cache file refers "
-                                    f"to a different job, id {cached_job_id}.")
+                                    "to a different job, id %s" % cached_job_id)
             if url is not None:
                 break
 
