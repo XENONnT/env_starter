@@ -86,6 +86,10 @@ Happy strax analysis, {username}!
 # (i.e. not /tmp)
 TMP_DIR = '/project2/lgrandi/xenonnt/development/.tmp_for_jupyter_job_launcher'
 
+# Default MB of RAM to request.
+# !! Please do not edit the file to change this, there is a --ram argument !!
+DEFAULT_RAM = 4480
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -106,7 +110,7 @@ def parse_arguments():
         default=1, type=int,
         help='Number of CPUs to request.')
     parser.add_argument('--ram',
-        default=4480, type=int,
+        default=DEFAULT_RAM, type=int,
         help='MB of RAM to request')
     parser.add_argument('--conda_path',
         default='<INFER>',
@@ -203,6 +207,12 @@ def main():
     else:
         print_flush("Submitting a new jupyter job")
 
+        use_reservation = (
+            (not args.force_new)
+            and (not args.bypass_reservation)
+            and args.ram <= DEFAULT_RAM
+            and args.cpu == 1)
+
         job_fn = tempfile.NamedTemporaryFile(
             delete=False, dir=TMP_DIR).name
         log_fn = tempfile.NamedTemporaryFile(
@@ -216,7 +226,7 @@ def main():
                     else CPU_HEADER.format(
                         partition=args.partition,
                         reservation=('#SBATCH --reservation=xenon_notebook'
-                                     if not args.bypass_reservation else ''))),
+                                     if use_reservation else ''))),
                 n_cpu=args.cpu,
                 mem_per_cpu=int(args.ram / args.cpu)))
         make_executable(job_fn)
