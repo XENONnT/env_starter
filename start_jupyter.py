@@ -46,7 +46,7 @@ module load cuda/9.1
 CPU_HEADER = """\
 #SBATCH --qos {partition}
 #SBATCH --partition {partition}
-#SBATCH --reservation=xenon_notebook
+{reservation}
 """
 
 # This is only if the user is NOT starting the singularity container
@@ -96,6 +96,9 @@ def parse_arguments():
     parser.add_argument('--partition',
         default='xenon1t', type=str,
         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
+    parser.add_argument('--bypass_reservation',
+        action='store_true',
+        help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--timeout',
         default=120, type=int,
         help='Seconds to wait for the jupyter server to start')
@@ -210,7 +213,10 @@ def main():
                 max_hours=2 if args.gpu else 24,
                 extra_header=(
                     GPU_HEADER if args.gpu
-                    else CPU_HEADER.format(partition=args.partition)),
+                    else CPU_HEADER.format(
+                        partition=args.partition,
+                        reservation=('#SBATCH --reservation=xenon_notebook'
+                                     if not args.bypass_reservation else ''))),
                 n_cpu=args.cpu,
                 mem_per_cpu=int(args.ram / args.cpu)))
         make_executable(job_fn)
