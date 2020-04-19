@@ -104,7 +104,7 @@ def parse_arguments():
         action='store_true',
         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--timeout',
-        default=120, type=int,
+        default=1200, type=int,
         help='Seconds to wait for the jupyter server to start')
     parser.add_argument('--cpu',
         default=1, type=int,
@@ -154,7 +154,7 @@ def main():
 
     if args.env == 'nt_singularity':
         start_env = os.path.join(args.env_starter_path, 'xnt_env') \
-                    + ' -j ' + args.container
+                    + ' -n ' + args.container + ' -j'
         batch_job = JOB_HEADER + start_env
     else:
         if args.conda_path == '<INFER>':
