@@ -1,15 +1,6 @@
 #!/bin/bash
 
-echo "Activating conda environment"
-source /opt/XENONnT/setup.sh
-
-which conda
-conda --version
-which python
-python --version
-
 echo "Setting environment variables"
-
 export X509_USER_PROXY=/project2/lgrandi/grid_proxy/xenon_service_proxy
 
 /project2/lgrandi/xenonnt/development/print_versions
