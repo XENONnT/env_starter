@@ -77,6 +77,10 @@ If you have a mac, instead do:
 
 ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open http://localhost:{port}/{token}
 
+If you have a mac with os Catalina, instead do:
+
+ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "http://localhost:{port}/{token}"
+
 Happy strax analysis, {username}!
 """
 
