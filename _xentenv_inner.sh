@@ -2,6 +2,7 @@
 
 echo "Setting environment variables"
 export X509_USER_PROXY=/project2/lgrandi/grid_proxy/xenon_service_proxy
+echo "Environment variables set"
 
 /project2/lgrandi/xenonnt/development/print_versions
 

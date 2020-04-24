@@ -40,7 +40,7 @@ GPU_HEADER = """\
 #SBATCH --partition=gpu2
 #SBATCH --gres=gpu:1
 
-module load cuda/9.1
+module load cuda/10.1
 """
 
 CPU_HEADER = """\
