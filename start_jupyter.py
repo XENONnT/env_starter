@@ -75,7 +75,7 @@ ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && sensibl
 
 If you have a mac, instead do:
 
-ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open http://localhost:{port}/{token}
+ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "http://localhost:{port}/{token}"
 
 Happy strax analysis, {username}!
 """
