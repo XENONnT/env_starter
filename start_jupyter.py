@@ -60,7 +60,7 @@ else
     echo "Using totally unmagical conda setup"
     export PATH="{conda_dir}/bin:$PATH"
 fi
-{conda_dir}/bin/conda activate {env_name}
+
 source {conda_dir}/bin/activate {env_name}
 
 JUP_PORT=$(( 15000 + (RANDOM %= 5000) ))
