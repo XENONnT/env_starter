@@ -209,6 +209,7 @@ def main():
 
         use_reservation = (
             (not args.force_new)
+            and args.partition == 'xenon1t'
             and (not args.bypass_reservation)
             and args.ram <= DEFAULT_RAM
             and args.cpu == 1)
