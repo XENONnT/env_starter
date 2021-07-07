@@ -65,7 +65,7 @@ source {conda_dir}/bin/activate {env_name}
 
 JUP_PORT=$(( 15000 + (RANDOM %= 5000) ))
 JUP_HOST=$(hostname -i)
-{conda_dir}/envs/{env_name}/bin/jupyter notebook --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
+{conda_dir}/envs/{env_name}/bin/{jupyter_env} --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
 """
 
 SUCCESS_MESSAGE = """
@@ -128,9 +128,13 @@ def parse_arguments():
              'to load XENONnT singularity container. '
              'Other arguments are passed to "conda activate" '
              "(and don't load a container).")
+    parser.add_argument('--jupyter_env',
+        default='jupyter notebook',
+        help='Type of notebook to activate; e.g. "jupyter notebook"  or "jupyter-lab"'
+                       )
     parser.add_argument('--container',
         default='/project2/lgrandi/xenonnt/singularity-images/xenonnt-development.simg',
-        help='Singularity container to load'
+        help='Singularity container to load. '
              'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
              'Default container: "latest"')
     parser.add_argument('--force_new',
@@ -172,6 +176,7 @@ def main():
         batch_job = (
             JOB_HEADER
             + START_JUPYTER.format(conda_dir=conda_dir,
+                                   jupyter_env=args.jupyter_env,
                                    env_name=args.env))
 
     url = None
