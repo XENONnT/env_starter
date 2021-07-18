@@ -1,7 +1,6 @@
 #!/bin/bash
-# Enter the XENONnT (singularity + conda) environment on dali/midway
-IMAGE_NAME=$1
 
+IMAGE_NAME=$1
 IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
