@@ -25,9 +25,7 @@ which can take time.
 
 #### Installation
 Login to midway/dali. For directions on getting accounts 
-setup etc, see [here](https://xe1t-wiki.lngs.infn.
-it/doku.php?id=xenon:xenon1t:cmp:computing:midway_cluster
-:instructions#for_midway_cluster). 
+setup etc, see [here](https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenon1t:cmp:computing:midway_cluster:instructions). 
 
 ```
 ssh {username}@dali.rcc.uchicago.edu
