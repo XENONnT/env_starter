@@ -6,16 +6,26 @@ import shutil
 import subprocess
 import stat
 import sys
-import tempfile
 import time
 
+# the path to this file
+ENVSTARTER_PATH = osp.dirname(__file__)
+# where you want to store sbatch and log files
+OUTPUT_DIR = osp.expanduser('~/straxlab')
+
+def printflush(x):
+    """Does print(x, flush=True), also in python 2.x"""
+    print(x)
+    sys.stdout.flush()
+
+
 SPLASH_SCREEN = r"""
-___   ___  _______ .__   __.   ______   .__   __. .__   __. .___________.
-\  \ /  / |   ____||  \ |  |  /  __  \  |  \ |  | |  \ |  | |           |
- \  V  /  |  |__   |   \|  | |  |  |  | |   \|  | |   \|  | `---|  |----`
-  >   <   |   __|  |  . `  | |  |  |  | |  . `  | |  . `  |     |  |     
- /  .  \  |  |____ |  |\   | |  `--'  | |  |\   | |  |\   |     |  |     
-/__/ \__\ |_______||__| \__|  \______/  |__| \__| |__| \__|     |__|     
+ __   __ ______  _   _   ____   _   _      _______ 
+ \ \ / /|  ____|| \ | | / __ \ | \ | |    |__   __|
+  \ V / | |__   |  \| || |  | ||  \| | _ __  | |   
+   > <  |  __|  | . ` || |  | || . ` || '_ \ | |   
+  / . \ | |____ | |\  || |__| || |\  || | | || |   
+ /_/ \_\|______||_| \_| \____/ |_| \_||_| |_||_|   
 
                 University of Chicago analysis facility Midway / Dali
 
@@ -32,6 +42,7 @@ JOB_HEADER = """#!/bin/bash
 #SBATCH --time={max_hours}:00:00
 {extra_header}
 
+export NUMEXPR_MAX_THREADS={n_cpu}
 echo Starting jupyter job
 
 """
@@ -48,6 +59,7 @@ CPU_HEADER = """\
 #SBATCH --partition {partition}
 {reservation}
 """
+
 
 # This is only if the user is NOT starting the singularity container
 # (for singularity, starting jupyter is done in _xentenv_inner)
@@ -80,59 +92,52 @@ ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "h
 Happy strax analysis, {username}!
 """
 
-
-# Dir for temporary files
-# Must be shared between batch queue and login node
-# (i.e. not /tmp)
-TMP_DIR = '/project2/lgrandi/xenonnt/development/.tmp_for_jupyter_job_launcher'
-
-# Default MB of RAM to request.
-# !! Please do not edit the file to change this, there is a --ram argument !!
-DEFAULT_RAM = 4480
+def make_executable(path):
+    """Make the file at path executable, see """
+    mode = os.stat(path).st_mode
+    mode |= (mode & 0o444) >> 2    # copy R bits to X
+    os.chmod(path, mode)
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--copy_tutorials',
-        action='store_true',
-        help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
+                        action='store_true',
+                        help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
     parser.add_argument('--partition',
-        default='xenon1t', type=str,
-        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
+                        default='xenon1t', type=str,
+                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
     parser.add_argument('--bypass_reservation',
         action='store_true',
         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--timeout',
-        default=1200, type=int,
-        help='Seconds to wait for the jupyter server to start')
+                        default=120, type=int,
+                        help='Seconds to wait for the jupyter server to start')
     parser.add_argument('--cpu',
-        default=1, type=int,
-        help='Number of CPUs to request.')
+                        default=2, type=int,
+                        help='Number of CPUs to request.')
     parser.add_argument('--ram',
-        default=DEFAULT_RAM, type=int,
-        help='MB of RAM to request')
+                        default=8000, type=int,
+                        help='MB of RAM to request')
     parser.add_argument('--conda_path',
-        default='<INFER>',
-        help="For non-singularity environments, path to conda binary to use."
-             "Default is to infer this from running 'which conda'.")
-    parser.add_argument('--env_starter_path',
-        default='/project2/lgrandi/xenonnt/development',
-        help="Directory containing the xnt_env script for starting the environment")
+                        default='<INFER>',
+                        help="For non-singularity environments, path to conda binary to use."
+                             "Default is to infer this from running 'which conda'.")
     parser.add_argument('--gpu',
-        action='store_true', default=False,
-        help='Request to run on a GPU partition. Limits runtime to 2 hours.')
+                        action='store_true', default=False,
+                        help='Request to run on a GPU partition. Limits runtime to 2 hours.')
     parser.add_argument('--env',
-        default='nt_singularity',
-        help='Environment to activate; defaults to "nt_singularity" '
-             'to load XENONnT singularity container. '
-             'Other arguments are passed to "conda activate" '
-             "(and don't load a container).")
+                        default='nt_singularity',
+                        help='Environment to activate; defaults to "nt_singularity" '
+                             'to load XENONnT singularity container. '
+                             'Other arguments are passed to "conda activate" '
+                             "(and don't load a container).")
     parser.add_argument('--container',
-        default='/project2/lgrandi/xenonnt/singularity-images/xenonnt-development.simg',
-        help='Singularity container to load'
-             'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
-             'Default container: "latest"')
+                        default='xenonnt-development.simg',
+                        help='Singularity container to load'
+                             'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
+                             'Default container: "latest"')
     parser.add_argument('--force_new',
         action='store_true', default=False,
         help='Start a new job even if you already have an old one running')
@@ -143,8 +148,13 @@ def main():
     args = parse_arguments()
     print_flush(SPLASH_SCREEN)
 
+    # Dir for the sbatch and log files
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    s_container = args.container
+
     if args.copy_tutorials:
-        dest = osp.expanduser('~/strax_tutorials')
+        dest = os.path.join(OUTPUT_DIR, 'strax_tutorials')
         if osp.exists(dest):
             print_flush("NOT copying tutorials, folder already exists")
         else:
@@ -153,9 +163,9 @@ def main():
                 dest)
 
     if args.env == 'nt_singularity':
-        start_env = os.path.join(args.env_starter_path, 'xnt_env') \
-                    + ' -n ' + args.container + ' -j'
-        batch_job = JOB_HEADER + start_env
+        batch_job = JOB_HEADER + "{env_starter}/start_notebook.sh {s_container}".format(env_starter=ENVSTARTER_PATH,
+                                                                                        s_container=s_container
+                                                                                        )
     else:
         if args.conda_path == '<INFER>':
             print_flush("Autoinferring conda path")
@@ -211,13 +221,13 @@ def main():
             (not args.force_new)
             and args.partition == 'xenon1t'
             and (not args.bypass_reservation)
-            and args.ram <= DEFAULT_RAM
-            and args.cpu == 1)
+            and args.cpu < 8
+        )
 
-        job_fn = tempfile.NamedTemporaryFile(
-            delete=False, dir=TMP_DIR).name
-        log_fn = tempfile.NamedTemporaryFile(
-            delete=False, dir=TMP_DIR).name
+        job_fn = os.path.join(OUTPUT_DIR, 'notebook.sbatch')
+        log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+        if os.path.exists(log_fn):
+            os.remove(log_fn)
         with open(job_fn, mode='w') as f:
             f.write(batch_job.format(
                 log_fn=log_fn,
@@ -255,7 +265,7 @@ def main():
                     if line_i >= lines_shown:
                         print_flush('\t' + line.rstrip())
                         lines_shown += 1
-                    if 'http' in line and 'sylabs' not in line:
+                    if 'http' in line and not any([excluded in line for excluded in ['sylabs', 'github.com']]):
                         url = line.split()[-1]
                         break
                 else:
