@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import stat
 import sys
-import tempfile
 import time
 
 # the path to this file
