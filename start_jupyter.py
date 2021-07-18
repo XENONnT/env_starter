@@ -9,7 +9,11 @@ import tempfile
 import time
 
 # for development, in case the env_starter repo is not in standard location
-ENVSTARTER_PATH = '/project2/lgrandi/xenonnt/development'
+ENVSTARTER_PATH = osp.dirname(__file__)
+
+# Dir for the sbatch and log files
+tmp_dir = osp.expanduser('~/straxlab')
+os.makedirs(tmp_dir, exist_ok=True)
 
 parser = argparse.ArgumentParser(
     description='Start a strax jupyter notebook server on the dali batch queue')
@@ -118,8 +122,8 @@ JUP_HOST=$(hostname -i)
 """
 
 if args.env == 'nt_singularity':
-    jupyter_job += '{envstarter}/xnt_env -j {s_container}'.format(envstarter=ENVSTARTER_PATH,
-                                                                  s_container=s_container)
+    jupyter_job += '{envstarter}/start_notebook.sh {s_container}'.format(envstarter=ENVSTARTER_PATH,
+                                                               s_container=s_container)
 else:
     if args.conda_path == '<INFER>':
         printflush("Autoinferring conda path")
@@ -137,17 +141,13 @@ else:
         env_name=args.env)
 
 
-# Dir for temporary files
-# Must be shared between batch queue and login node
-# (i.e. not /tmp)
-tmp_dir = '/project2/lgrandi/xenonnt/development/.tmp_for_jupyter_job_launcher'
+
 
 def make_executable(path):
     """Make the file at path executable, see """
     mode = os.stat(path).st_mode
     mode |= (mode & 0o444) >> 2    # copy R bits to X
     os.chmod(path, mode)
-    
 
 url_cache_fn = osp.join(
     os.environ['HOME'],
@@ -165,14 +165,14 @@ for line in q.decode().splitlines():
         
 else:
     printflush("Submitting a new jupyter job")
-    job_fn = tempfile.NamedTemporaryFile(
-        delete=False, dir=tmp_dir).name
-    log_fn = tempfile.NamedTemporaryFile(
-        delete=False, dir=tmp_dir).name
+    job_fn = osp.join(tmp_dir, 'straxlab.sbatch')
+    log_fn = osp.join(tmp_dir, 'straxlab.log')
+    # delete the log
+    os.remove(log_fn)
     with open(job_fn, mode='w') as f:
         f.write(jupyter_job.format(
             log_fn=log_fn,
-            max_hours=2 if args.gpu else 24,
+            max_hours=2 if args.gpu else 8,
             extra_header=gpu_header if args.gpu else cpu_header,
             n_cpu=n_cpu,
             mem_per_cpu=int(args.ram/n_cpu)))
@@ -195,7 +195,7 @@ else:
         with open(log_fn, mode='r') as f:
             content = f.readlines()
             for line in content:
-                if 'http' in line and not 'sylabs' in line:
+                if 'http' in line and not any([excluded in line for excluded in ['sylabs', 'github.com']]):
                     url = line.split()[-1]
                     break
             else:
