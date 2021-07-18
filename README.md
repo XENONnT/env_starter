@@ -97,7 +97,7 @@ your own personal laptop/web browser, you need to run
 the `ssh` command listed above. 
 
 ``` 
-ssh -fN -L {something} && open  something}"
+ssh -fN -L {something} && {sensible-broswer/open something}
 ```
 
 What this does is setup 
@@ -107,9 +107,6 @@ that is actually running the jupyter notebook.
 Everything after the `&&` is opening a web browser and 
 pointing it to the url where you can see the jupyter 
 notebook.
-
-
-
 
 
 ### Standard Usage
@@ -134,13 +131,22 @@ TODO
 
 
 ### Convenient shortcuts
-For convenience, it is useful to add this to your `~/.
-bashrc` on Midway:
 
+*Symbolic link*. For convenience, it might be useful to 
+make a symbolic 
+link of 
+the `start_jupyer.py` command to your home directory. 
+For me this looked like this:
 ```
-export ENV_STARTER=/path/to/your/env_starter
+[ershockley@dali-login1 ~]$ ln -s start_jupyter.py /home/ershockley/nt/computing/env_starter/start_jupyter.py
 ```
-*Remember to actually fill in the real path you chose*.
+but yours would look different depending on where you 
+cloned the `env_starter` repository. After doing this, 
+you can then shorten the job starter script significantly:
+``` 
+ssh {user}@dali.rcc.uchicago.edu start_jupyter.py
+```
+and you can pass the same flags as above. 
 
 
 ### Further Customization
