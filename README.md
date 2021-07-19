@@ -121,21 +121,88 @@ TODO
 
 ### Convenient shortcuts
 
-*Symbolic link*. For convenience, it might be useful to 
-make a symbolic 
-link of 
-the `start_jupyer.py` command to your home directory. 
-For me this looked like this:
-```
-[ershockley@dali-login1 ~]$ ln -s /home/ershockley/nt/computing/env_starter/start_jupyter.py ~/start_jupyter.py 
-```
-but yours would look different depending on where you 
-cloned the `env_starter` repository. After doing this, 
-you can then shorten the job starter script significantly:
+*SSH profile and key authentication*. It is useful to add 
+midway to your ssh 
+profile so you can use shorter names when sshing. See 
+[here](https://linuxize.com/post/using-the-ssh-config-file/). 
+My `~/.ssh/config` looks like the following:
 ``` 
-ssh {user}@dali.rcc.uchicago.edu start_jupyter.py
+Host dali
+User ershockley
+Hostname dali-login1.rcc.uchicago.edu
 ```
-and you can pass the same flags as above. 
+pairing this with [ssh-key authentication](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server), it is very 
+easy to login to midway:
+``` 
+Evans-MacBook-Air:~ shocks$ ssh dali
+Last login: Mon Jul 19 10:59:02 2021 from wireless-169-228-79-134.ucsd.edu
+===============================================================================
+                               Welcome to Midway
+                           Research Computing Center
+                             University of Chicago
+                            http://rcc.uchicago.edu
+```
+
+
+*Aliases*. You can use aliases to make running this 
+script more convenient. Perhaps easiest is just make an 
+alias on your personal machine. On Linux you can add 
+aliases to `~/.bashrc` and for MacOS it is `~/.
+bash_profile`. For your respective machine, add an alias 
+like the following (note this assumes you have setup the 
+ssh config as above): 
+
+``` 
+alias notebook="ssh dali /path/to/your/env_starter/start_jupyter.py"
+``` 
+
+Then on your personal machine you can then start up a 
+notebook just with the command `notebook`. You can also 
+pass any arguments as you normally would. For example:
+``` 
+Evans-MacBook-Air:~ shocks$ notebook --container xenonnt-2021.07.1.simg
+
+ __   __ ______  _   _   ____   _   _      _______
+ \ \ / /|  ____|| \ | | / __ \ | \ | |    |__   __|
+  \ V / | |__   |  \| || |  | ||  \| | _ __  | |
+   > <  |  __|  | . ` || |  | || . ` || '_ \ | |
+  / . \ | |____ | |\  || |__| || |\  || | | || |
+ /_/ \_\|______||_| \_| \____/ |_| \_||_| |_||_|
+
+                    The UChicago Analysis Center
+                    
+Submitting a new jupyter job
+	Submitting sbatch /home/ershockley/straxlab/notebook.sbatch
+	sbatch returned: b'Submitted batch job 12229201\n'
+	You have job id 12229201
+Waiting for your job to start
+	Looking for logfile /home/ershockley/straxlab/notebook.log
+	still waiting...
+Job started. Logfile is displayed below; we're looking for the jupyter URL.
+	Starting jupyter job
+	Using singularity image: /project2/lgrandi/xenonnt/singularity-images/xenonnt-2021.07.1.simg
+```
+
+Another option would be to make an alias on midway. This 
+involves one extra step. First, make the alias in your 
+`~/.bashrc`, which for me looked like this: 
+
+``` 
+alias start_notebook="/home/ershockley/nt/computing/env_starter/start_jupyter.py"
+```
+But in order for this to run via ssh you also need to 
+add this to *the very top of* your `.bashrc`:
+``` 
+if [ -z "$PS1" ]; then
+  shopt -s expand_aliases
+fi
+```
+as discussed in this [stackexchange thread](https://unix.stackexchange.com/questions/425319/how-do-i-execute-a-remote-alias-over-an-ssh).
+After this, you should then be able to run something like: 
+
+``` 
+Evans-MacBook-Air:~ shocks$ ssh dali start_notebook --container xenonnt-2021.07.1.simg
+```
 
 
 ### Further Customization
