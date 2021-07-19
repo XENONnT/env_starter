@@ -27,7 +27,7 @@ SPLASH_SCREEN = r"""
   / . \ | |____ | |\  || |__| || |\  || | | || |   
  /_/ \_\|______||_| \_| \____/ |_| \_||_| |_||_|   
 
-                University of Chicago analysis facility Midway / Dali
+                    The UChicago Analysis Center
 
 """
 

@@ -100,28 +100,17 @@ the `ssh` command listed above.
 ssh -fN -L {something} && {sensible-broswer/open something}
 ```
 
-What this does is setup 
-an ssh tunnel between the machine you run those commands 
-on (again, not Midway!) and the worker node on Midway 
-that is actually running the jupyter notebook. 
-Everything after the `&&` is opening a web browser and 
-pointing it to the url where you can see the jupyter 
-notebook.
+What this does is setup an ssh tunnel between the machine you run those commands on (again, not Midway!) and the worker node on Midway that is actually running the jupyter notebook. Everything after the `&&` is opening a web browser and pointing it to the url where you can see the jupyter notebook.
 
 
 ### Standard Usage
-This script submits jobs to the midway cluster and 
-so must be executed on midway itself. However, it is 
-convenient to execute it over ssh *from your personal 
-machine*:
+This script submits jobs to the midway cluster and so must be executed on midway itself. However, it is convenient to execute it over ssh *from your personal machine*:
 
 ```
-ssh {username}@dali.rcc.uchicago.edu 
-/path/to/your/env_starter/env_starter/start_jupyter.py
+ssh {username}@dali.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.py
 ```
 
-You should then see the output as above and then be able 
-to access the notebook. 
+You should then see the output as above and then be able to access the notebook. 
 
 #### Arguments
 There are several arguments you can pass to 
@@ -138,7 +127,7 @@ link of
 the `start_jupyer.py` command to your home directory. 
 For me this looked like this:
 ```
-[ershockley@dali-login1 ~]$ ln -s start_jupyter.py /home/ershockley/nt/computing/env_starter/start_jupyter.py
+[ershockley@dali-login1 ~]$ ln -s /home/ershockley/nt/computing/env_starter/start_jupyter.py ~/start_jupyter.py 
 ```
 but yours would look different depending on where you 
 cloned the `env_starter` repository. After doing this, 
@@ -162,6 +151,5 @@ gets written to
 which should serve as a good template to make further 
 changes. If you do this, we recommend copying your 
 customized sbatch script to a new filename, as otherwise 
-it will be overwritten next time you run `start_jupyter.
-py`. 
+it will be overwritten next time you run `start_jupyter.py`. 
 
