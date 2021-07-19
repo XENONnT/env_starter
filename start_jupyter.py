@@ -241,7 +241,7 @@ def main():
         with open(job_fn, mode='w') as f:
             f.write(batch_job.format(
                 log_fn=log_fn,
-                max_hours=2 if args.gpu else 16,
+                max_hours=2 if args.gpu else 8,
                 extra_header=(
                     GPU_HEADER if args.gpu
                     else CPU_HEADER.format(
