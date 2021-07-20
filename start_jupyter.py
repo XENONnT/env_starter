@@ -1,4 +1,4 @@
-#!/cvmfs/xenon.opensciencegrid.org/releases/anaconda/2.4/bin/python
+#!/cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
 import argparse
 import os
 import os.path as osp
