@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/cvmfs/xenon.opensciencegrid.org/releases/anaconda/2.4/bin/python
 import argparse
 import os
 import os.path as osp
@@ -17,7 +17,6 @@ def printflush(x):
     """Does print(x, flush=True), also in python 2.x"""
     print(x)
     sys.stdout.flush()
-
 
 SPLASH_SCREEN = r"""
  __   __ ______  _   _   ____   _   _      _______ 
