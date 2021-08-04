@@ -42,6 +42,10 @@ cd path/to/wherever/you/want/env_start
 Finally, clone the repository.
 
 ```
+# https based
+git clone https://github.com/XENONnT/env_starter.git
+# OR
+# ssh based
 git clone git@github.com:XENONnT/env_starter.git
 ```
  
