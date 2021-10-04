@@ -1,6 +1,7 @@
 #!/bin/bash
 
 IMAGE_NAME=$1
+JUPYTER_TYPE=$2
 IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
@@ -13,6 +14,10 @@ elif [ -e ${IMAGE_DIR}/${IMAGE_NAME} ]; then
 else
   echo "We could not find the container at its full path ${IMAGE_NAME} or in ${IMAGE_DIR}. Exiting."
   exit 1
+fi
+
+if [ "x${JUPYTER_TYPE}" = "x" ]; then
+  JUPYTER_TYPE='lab'
 fi
 
 echo "Using singularity image: ${CONTAINER}"
@@ -44,7 +49,7 @@ echo -e "
     " 2>&1
 
 
-jupyter lab --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir $HOME 2>&1
+jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir $HOME 2>&1
 EOF
 chmod +x $INNER
 

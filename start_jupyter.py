@@ -27,7 +27,7 @@ SPLASH_SCREEN = r"""
   / . \ | |____ | |\  || |__| || |\  || | | || |   
  /_/ \_\|______||_| \_| \____/ |_| \_||_| |_||_|   
 
-                University of Chicago analysis facility Midway / Dali
+                    The UChicago Analysis Center
 
 """
 
@@ -77,7 +77,7 @@ source {conda_dir}/bin/activate {env_name}
 
 JUP_PORT=$(( 15000 + (RANDOM %= 5000) ))
 JUP_HOST=$(hostname -i)
-{conda_dir}/envs/{env_name}/bin/jupyter notebook --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
+{conda_dir}/envs/{env_name}/bin/jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
 """
 
 SUCCESS_MESSAGE = """
@@ -141,6 +141,11 @@ def parse_arguments():
     parser.add_argument('--force_new',
         action='store_true', default=False,
         help='Start a new job even if you already have an old one running')
+    parser.add_argument('--jupyter',
+                        choices=['lab', 'notebook'],
+                        default='lab',
+                        help='Use jupyter-lab or jupyter-notebook')
+
     return parser.parse_args()
 
 
@@ -163,9 +168,11 @@ def main():
                 dest)
 
     if args.env == 'nt_singularity':
-        batch_job = JOB_HEADER + "{env_starter}/start_notebook.sh {s_container}".format(env_starter=ENVSTARTER_PATH,
-                                                                                        s_container=s_container
-                                                                                        )
+        batch_job = JOB_HEADER + \
+                    "{env_starter}/start_notebook.sh {s_container} {jupyter}".format(env_starter=ENVSTARTER_PATH,
+                                                                                     s_container=s_container,
+                                                                                     jupyter=args.jupyter,
+                                                                                    )
     else:
         if args.conda_path == '<INFER>':
             print_flush("Autoinferring conda path")
@@ -182,7 +189,10 @@ def main():
         batch_job = (
             JOB_HEADER
             + START_JUPYTER.format(conda_dir=conda_dir,
-                                   env_name=args.env))
+                                   env_name=args.env,
+                                   jupyter=args.jupyter
+                                   )
+                   )
 
     url = None
     url_cache_fn = osp.join(
@@ -231,7 +241,7 @@ def main():
         with open(job_fn, mode='w') as f:
             f.write(batch_job.format(
                 log_fn=log_fn,
-                max_hours=2 if args.gpu else 16,
+                max_hours=2 if args.gpu else 8,
                 extra_header=(
                     GPU_HEADER if args.gpu
                     else CPU_HEADER.format(
