@@ -98,8 +98,8 @@ def parse_arguments():
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
     parser.add_argument('--bypass_reservation', action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
-    parser.add_argument('--nodes',  default=None, nargs='*',
-                        help="Specify a list of nodes, if desired. By default no specification made")
+    parser.add_argument('--node',  default=None, nargs='*',
+                        help="Specify a node, if desired. By default no specification made")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
@@ -227,15 +227,16 @@ def main():
         if os.path.exists(log_fn):
             os.remove(log_fn)
         with open(job_fn, mode='w') as f:
+            extra_header = (GPU_HEADER if args.gpu
+                            else CPU_HEADER.format(partition=args.partition,
+                                                   reservation=('#SBATCH --reservation=xenon_notebook'
+                                                                if use_reservation else '')))
+            if args.node:
+                extra_header += '\n#SBATCH --nodelist={node}'.format(node=args.node)
             f.write(batch_job.format(
                 log_fn=log_fn,
                 max_hours=2 if args.gpu else 8,
-                extra_header=(
-                    GPU_HEADER if args.gpu
-                    else CPU_HEADER.format(
-                        partition=args.partition,
-                        reservation=('#SBATCH --reservation=xenon_notebook'
-                                     if use_reservation else ''))),
+                extra_header=extra_header,
                 n_cpu=args.cpu,
                 mem_per_cpu=int(args.ram / args.cpu)))
         make_executable(job_fn)

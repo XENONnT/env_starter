@@ -51,13 +51,12 @@ echo -e "
     to your local browser.
     " 2>&1
 
-echo "Bleeding edge: $BLEEDING_EDGE"
 if [ "$BLEEDING_EDGE" = "true" ]; then
   echo "Using bleeding-edge environment"
   source /dali/lgrandi/xenonnt/software/bleeding_edge.sh
 fi
 
-jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
+# jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
 EOF
 chmod +x $INNER
 
