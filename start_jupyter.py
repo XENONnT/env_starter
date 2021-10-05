@@ -118,7 +118,7 @@ def parse_arguments():
                         help='Environment to activate; defaults to "singularity" '
                              'to load XENONnT singularity container. '
                              'Passing "cvmfs" will use the conda environment installed in cvmfs, '
-                             'using the container argument to determine which env exactly ')
+                             'using the --tag argument to determine which env exactly ')
     parser.add_argument('--tag',
                         default='development',
                         help='Tagged environment to load'
