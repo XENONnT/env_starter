@@ -56,7 +56,7 @@ if [ "$BLEEDING_EDGE" = "true" ]; then
   source /dali/lgrandi/xenonnt/software/bleeding_edge.sh
 fi
 
-# jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
+jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
 EOF
 chmod +x $INNER
 
