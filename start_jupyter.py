@@ -9,7 +9,7 @@ import sys
 import time
 
 # the path to this file
-ENVSTARTER_PATH = osp.dirname(__file__)
+ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
 # where you want to store sbatch and log files
 OUTPUT_DIR = osp.expanduser('~/straxlab')
 
@@ -64,20 +64,11 @@ CPU_HEADER = """\
 # This is only if the user is NOT starting the singularity container
 # (for singularity, starting jupyter is done in _xentenv_inner)
 START_JUPYTER = """
-# Arcane conda setup instructions
-if [ -f "{conda_dir}/etc/profile.d/conda.sh" ]; then
-    echo "Using slightly less magic conda setup"
-    . "{conda_dir}/etc/profile.d/conda.sh"
-else
-    echo "Using totally unmagical conda setup"
-    export PATH="{conda_dir}/bin:$PATH"
-fi
-
-source {conda_dir}/bin/activate {env_name}
-
 JUP_PORT=$(( 15000 + (RANDOM %= 5000) ))
 JUP_HOST=$(hostname -i)
-{conda_dir}/envs/{env_name}/bin/jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST 2>&1
+{bleeding_edge_sh}
+echo $PYTHONPATH
+jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST --notebook-dir {notebook_dir} 2>&1
 """
 
 SUCCESS_MESSAGE = """
@@ -102,15 +93,13 @@ def make_executable(path):
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Start a strax jupyter notebook server on the dali batch queue')
-    parser.add_argument('--copy_tutorials',
-                        action='store_true',
-                        help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
     parser.add_argument('--partition',
                         default='xenon1t', type=str,
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
-    parser.add_argument('--bypass_reservation',
-        action='store_true',
-        help="Do not use the notebook reservation (useful if it is full)")
+    parser.add_argument('--bypass_reservation', action='store_true',
+                        help="Do not use the notebook reservation (useful if it is full)")
+    parser.add_argument('--nodes',  default=None, nargs='*',
+                        help="Specify a list of nodes, if desired. By default no specification made")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
@@ -120,24 +109,21 @@ def parse_arguments():
     parser.add_argument('--ram',
                         default=8000, type=int,
                         help='MB of RAM to request')
-    parser.add_argument('--conda_path',
-                        default='<INFER>',
-                        help="For non-singularity environments, path to conda binary to use."
-                             "Default is to infer this from running 'which conda'.")
     parser.add_argument('--gpu',
                         action='store_true', default=False,
                         help='Request to run on a GPU partition. Limits runtime to 2 hours.')
     parser.add_argument('--env',
-                        default='nt_singularity',
-                        help='Environment to activate; defaults to "nt_singularity" '
+                        default='singularity',
+                        choices=['singularity', 'cvmfs'],
+                        help='Environment to activate; defaults to "singularity" '
                              'to load XENONnT singularity container. '
-                             'Other arguments are passed to "conda activate" '
-                             "(and don't load a container).")
-    parser.add_argument('--container',
-                        default='xenonnt-development.simg',
-                        help='Singularity container to load'
+                             'Passing "cvmfs" will use the conda environment installed in cvmfs, '
+                             'using the container argument to determine which env exactly ')
+    parser.add_argument('--tag',
+                        default='development',
+                        help='Tagged environment to load'
                              'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
-                             'Default container: "latest"')
+                             'Default: "development", or -- equivalently -- "latest"')
     parser.add_argument('--force_new',
         action='store_true', default=False,
         help='Start a new job even if you already have an old one running')
@@ -145,6 +131,13 @@ def parse_arguments():
                         choices=['lab', 'notebook'],
                         default='lab',
                         help='Use jupyter-lab or jupyter-notebook')
+    parser.add_argument('--bleeding_edge', action='store_true',
+                        help="Use the bleeding edge branch of everything in /dali/lgrandi/xenonnt/software. "
+                             "Only use this if you know what you're doing, as it will modify the environment significantly.")
+    parser.add_argument('--notebook_dir', default=os.environ['HOME'], help='The working directory passed to jupyter')
+    parser.add_argument('--copy_tutorials',
+                        action='store_true',
+                        help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
 
     return parser.parse_args()
 
@@ -153,10 +146,9 @@ def main():
     args = parse_arguments()
     print_flush(SPLASH_SCREEN)
 
+
     # Dir for the sbatch and log files
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-    s_container = args.container
 
     if args.copy_tutorials:
         dest = os.path.join(OUTPUT_DIR, 'strax_tutorials')
@@ -167,32 +159,28 @@ def main():
                 '/dali/lgrandi/strax/straxen/notebooks/tutorials',
                 dest)
 
-    if args.env == 'nt_singularity':
+    if args.env == 'singularity':
+        s_container = 'xenonnt-%s.simg' % args.tag
+        bleeding_edge = "true" if args.bleeding_edge else "false"
         batch_job = JOB_HEADER + \
-                    "{env_starter}/start_notebook.sh {s_container} {jupyter}".format(env_starter=ENVSTARTER_PATH,
-                                                                                     s_container=s_container,
-                                                                                     jupyter=args.jupyter,
-                                                                                    )
-    else:
-        if args.conda_path == '<INFER>':
-            print_flush("Autoinferring conda path")
-            conda_path = subprocess.check_output(['which', 'conda']).strip()
-            conda_path = conda_path.decode()
-        else:
-            conda_path = args.conda_path
-
-        conda_dir = os.path.dirname(conda_path)
-        conda_dir = os.path.abspath(os.path.join(conda_dir, os.pardir))
-        print_flush("Using conda from %s instead of singularity container."
-                    % conda_dir)
-
-        batch_job = (
-            JOB_HEADER
-            + START_JUPYTER.format(conda_dir=conda_dir,
-                                   env_name=args.env,
-                                   jupyter=args.jupyter
-                                   )
-                   )
+                    "{env_starter}/start_notebook.sh " \
+                    "{s_container} {jupyter} {nbook_dir} {bleeding_edge}".format(env_starter=ENVSTARTER_PATH,
+                                                                                 s_container=s_container,
+                                                                                 jupyter=args.jupyter,
+                                                                                 nbook_dir=args.notebook_dir,
+                                                                                 bleeding_edge=bleeding_edge
+                                                                                 )
+    elif args.env == 'cvmfs':
+        bleeding_edge_sh = "source /dali/lgrandi/xenonnt/software/bleeding_edge.sh" if args.bleeding_edge else ""
+        if len(bleeding_edge_sh):
+            print_flush("Using bleeding-edge environment")
+        batch_job = (JOB_HEADER
+                     + "source /cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag)
+                     + START_JUPYTER.format(jupyter=args.jupyter,
+                                            notebook_dir=args.notebook_dir,
+                                            bleeding_edge_sh=bleeding_edge_sh)
+                     )
+        print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
 
     url = None
     url_cache_fn = osp.join(
