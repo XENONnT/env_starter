@@ -66,7 +66,6 @@ CPU_HEADER = """\
 START_JUPYTER = """
 JUP_PORT=$(( 15000 + (RANDOM %= 5000) ))
 JUP_HOST=$(hostname -i)
-{bleeding_edge_sh}
 echo $PYTHONPATH
 jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST --notebook-dir {notebook_dir} 2>&1
 """
@@ -98,8 +97,7 @@ def parse_arguments():
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
     parser.add_argument('--bypass_reservation', action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
-    parser.add_argument('--node',  default=None, nargs='*',
-                        help="Specify a node, if desired. By default no specification made")
+    parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
@@ -131,9 +129,6 @@ def parse_arguments():
                         choices=['lab', 'notebook'],
                         default='lab',
                         help='Use jupyter-lab or jupyter-notebook')
-    parser.add_argument('--bleeding_edge', action='store_true',
-                        help="Use the bleeding edge branch of everything in /dali/lgrandi/xenonnt/software. "
-                             "Only use this if you know what you're doing, as it will modify the environment significantly.")
     parser.add_argument('--notebook_dir', default=os.environ['HOME'], help='The working directory passed to jupyter')
     parser.add_argument('--copy_tutorials',
                         action='store_true',
@@ -161,24 +156,18 @@ def main():
 
     if args.env == 'singularity':
         s_container = 'xenonnt-%s.simg' % args.tag
-        bleeding_edge = "true" if args.bleeding_edge else "false"
         batch_job = JOB_HEADER + \
                     "{env_starter}/start_notebook.sh " \
-                    "{s_container} {jupyter} {nbook_dir} {bleeding_edge}".format(env_starter=ENVSTARTER_PATH,
-                                                                                 s_container=s_container,
-                                                                                 jupyter=args.jupyter,
-                                                                                 nbook_dir=args.notebook_dir,
-                                                                                 bleeding_edge=bleeding_edge
-                                                                                 )
+                    "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
+                                                                 s_container=s_container,
+                                                                 jupyter=args.jupyter,
+                                                                 nbook_dir=args.notebook_dir,
+                                                                )
     elif args.env == 'cvmfs':
-        bleeding_edge_sh = "source /dali/lgrandi/xenonnt/software/bleeding_edge.sh" if args.bleeding_edge else ""
-        if len(bleeding_edge_sh):
-            print_flush("Using bleeding-edge environment")
         batch_job = (JOB_HEADER
                      + "source /cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag)
                      + START_JUPYTER.format(jupyter=args.jupyter,
-                                            notebook_dir=args.notebook_dir,
-                                            bleeding_edge_sh=bleeding_edge_sh)
+                                            notebook_dir=args.notebook_dir)
                      )
         print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
 

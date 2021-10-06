@@ -3,7 +3,6 @@
 IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
-BLEEDING_EDGE=$4
 
 IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
 
@@ -50,11 +49,6 @@ echo -e "
     OR replace "$ipnip" in the address below with "localhost" and copy
     to your local browser.
     " 2>&1
-
-if [ "$BLEEDING_EDGE" = "true" ]; then
-  echo "Using bleeding-edge environment"
-  source /dali/lgrandi/xenonnt/software/bleeding_edge.sh
-fi
 
 jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
 EOF
