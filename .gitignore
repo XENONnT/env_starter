@@ -1,8 +1,1 @@
-.tmp*
-bin
-lib
-straxen
-strax
-flamedisx
-old
-.idea
+.singularity_inner

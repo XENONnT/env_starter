@@ -2,6 +2,8 @@
 
 IMAGE_NAME=$1
 JUPYTER_TYPE=$2
+NOTEBOOK_DIR=$3
+
 IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
@@ -48,8 +50,7 @@ echo -e "
     to your local browser.
     " 2>&1
 
-
-jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir $HOME 2>&1
+jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
 EOF
 chmod +x $INNER
 

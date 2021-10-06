@@ -39,13 +39,9 @@ directory.
 cd path/to/wherever/you/want/env_start
 ```
 
-Finally, clone the repository.
+Clone the repository:
 
 ```
-# https based
-git clone https://github.com/XENONnT/env_starter.git
-# OR
-# ssh based
 git clone git@github.com:XENONnT/env_starter.git
 ```
  
@@ -120,8 +116,56 @@ You should then see the output as above and then be able to access the notebook.
 There are several arguments you can pass to 
 `start_jupyter.py` to customize your job. 
 
-TODO
+```
+usage: start_jupyter.py [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
+                        [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
+                        [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
+                        [--copy_tutorials]
 
+Start a strax jupyter notebook server on the dali batch queue
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --partition PARTITION
+                        RCC/DALI partition to use. Try dali, broadwl, or xenon1t.
+  --bypass_reservation  Do not use the notebook reservation (useful if it is full)
+  --node NODE           Specify a node, if desired. By default no specification made
+  --timeout TIMEOUT     Seconds to wait for the jupyter server to start
+  --cpu CPU             Number of CPUs to request.
+  --ram RAM             MB of RAM to request
+  --gpu                 Request to run on a GPU partition. Limits runtime to 2 hours.
+  --env {singularity,cvmfs}
+                        Environment to activate; defaults to "singularity" to load XENONnT singularity
+                        container. Passing "cvmfs" will use the conda environment installed in cvmfs, using
+                        the --tag argument to determine which env exactly
+  --tag TAG             Tagged environment to loadSee 
+  wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking Default: "development", or --
+                        equivalently -- "latest"
+  --force_new           Start a new job even if you already have an old one running
+  --jupyter {lab,notebook}
+                        Use jupyter-lab or jupyter-notebook
+  --notebook_dir NOTEBOOK_DIR
+                        The working directory passed to jupyter
+  --copy_tutorials      Copy tutorials to ~/strax_tutorials (if it does not exist)
+
+```
+
+
+We highlight just a few here. First, the `--env`
+argument is used to specify either `singularity` (which 
+is the default) or `cvmfs`. The default one will run in 
+a singularity container, which is isolated from the host 
+system software. This means you will not be able to run, 
+for example `sbatch` or other SLURM commands from inside 
+the container. The `cvmfs` env, however, does not have 
+this problem, but it is more likely to have environment 
+conflicts from the host system, which can often affect 
+rucio-related commands. 
+
+The `--tag` argument is used to specify which tag of 
+base_environmnent to use. This applies to both the 
+singularity and cvmfs environments. It defaults to 
+`development`, the most up-to-date env.
 
 ### Convenient shortcuts
 
