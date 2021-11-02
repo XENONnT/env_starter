@@ -133,6 +133,9 @@ def parse_arguments():
     parser.add_argument('--copy_tutorials',
                         action='store_true',
                         help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
+    parser.add_argument('--local_cutax',
+                        action='store_true',
+                        help='enable the usage of local installation of cutax')
 
     return parser.parse_args()
 
@@ -144,6 +147,9 @@ def main():
 
     # Dir for the sbatch and log files
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    if args.local_cutax:
+        os.environ['INSTALL_CUTAX'] = '0'
 
     if args.copy_tutorials:
         dest = os.path.join(OUTPUT_DIR, 'strax_tutorials')
