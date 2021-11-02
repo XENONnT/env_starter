@@ -120,7 +120,7 @@ There are several arguments you can pass to
 usage: start_jupyter.py [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
                         [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
-                        [--copy_tutorials]
+                        [--copy_tutorials] [--local_cutax]
 
 Start a strax jupyter notebook server on the dali batch queue
 
@@ -147,6 +147,7 @@ optional arguments:
   --notebook_dir NOTEBOOK_DIR
                         The working directory passed to jupyter
   --copy_tutorials      Copy tutorials to ~/strax_tutorials (if it does not exist)
+  --local_cutax         enable the usage of local installation of cutax
 
 ```
 
@@ -166,6 +167,8 @@ The `--tag` argument is used to specify which tag of
 base_environmnent to use. This applies to both the 
 singularity and cvmfs environments. It defaults to 
 `development`, the most up-to-date env.
+
+If you are developing `cutax` and want to use your local installation, you can add `--local_cutax`.  
 
 ### Convenient shortcuts
 
