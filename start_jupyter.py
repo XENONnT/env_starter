@@ -135,7 +135,7 @@ def parse_arguments():
                         help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
     parser.add_argument('--local_cutax',
                         action='store_true',
-                        help='enable the usage of local installation of cutax')
+                        help='Enable the usage of locally installed cutax')
 
     return parser.parse_args()
 
