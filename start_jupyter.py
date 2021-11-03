@@ -185,11 +185,15 @@ def main():
     
     # Check if a job is already running
     q = subprocess.check_output(['squeue', '-u', username])
-    for line in q.decode().splitlines():
-        if 'straxlab' in line and not args.force_new:
-            job_id = int(line.split()[0])
-            print_flush("You still have a running job with id %d!" % job_id)
-            print_flush("\tTrying to retrieve the URL from " + url_cache_fn)
+    jobs = [line for line in q.decode().splitlines() if 'straxlab' in line]
+    job_ids = [int(job.split()[0]) for job in jobs]
+
+    if job_ids:
+        print_flush("You still have running straxlab jobs with ids [%s]!" % ",".join([str(id) for id in job_ids]))
+
+    for job_id in job_ids:
+        if not args.force_new:
+            print_flush("\tTrying to retrieve the URL for job %d from " % job_id + url_cache_fn)
             print_flush("\tIf it doesn't work, login and cancel your job "
                         "so we can start a new one.")
             with open(url_cache_fn) as f:
@@ -218,7 +222,10 @@ def main():
         )
 
         job_fn = os.path.join(OUTPUT_DIR, 'notebook.sbatch')
-        log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+        if not args.force_new:
+            log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+        else:
+            log_fn = os.path.join(OUTPUT_DIR, 'notebook_forced.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
         with open(job_fn, mode='w') as f:
@@ -283,10 +290,20 @@ def main():
         token = '?token=' + token
     else:
         token = ''
+        
+    # Check if many jobs are running
+    q = subprocess.check_output(['squeue', '-u', username])
+    jobs = [line for line in q.decode().splitlines() if 'straxlab' in line]
+    job_ids = [int(job.split()[0]) for job in jobs]
+
+    if len(job_ids) > 1:
+        print_flush("\nPlease consider stopping remaining straxlab jobs:")
+        for job in jobs:
+            print_flush("\t" + job)
 
     print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username))
-
-
+    
+    
 def print_flush(x):
     """Does print(x, flush=True), also in python 2.x"""
     print(x)
