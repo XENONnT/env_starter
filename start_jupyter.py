@@ -7,6 +7,8 @@ import subprocess
 import stat
 import sys
 import time
+from random import choices
+from string import ascii_lowercase
 
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
@@ -187,6 +189,7 @@ def main():
     q = subprocess.check_output(['squeue', '-u', username])
     jobs = [line for line in q.decode().splitlines() if 'straxlab' in line]
     job_ids = [int(job.split()[0]) for job in jobs]
+    unique_id = '' if len(job_ids) == 0 else '_' + get_unique_id()
 
     if job_ids:
         print_flush("You still have running straxlab jobs with ids [%s]!" % ",".join([str(id) for id in job_ids]))
@@ -221,11 +224,11 @@ def main():
             and args.cpu < 8
         )
 
-        job_fn = os.path.join(OUTPUT_DIR, 'notebook.sbatch')
+        job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
         if not args.force_new:
-            log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+            log_fn = os.path.join(OUTPUT_DIR, f'notebook.log')
         else:
-            log_fn = os.path.join(OUTPUT_DIR, 'notebook_forced.log')
+            log_fn = os.path.join(OUTPUT_DIR, f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
         with open(job_fn, mode='w') as f:
@@ -308,6 +311,10 @@ def print_flush(x):
     """Does print(x, flush=True), also in python 2.x"""
     print(x)
     sys.stdout.flush()
+
+
+def get_unique_id():
+    return ''.join(choices(ascii_lowercase, k=6))
 
 
 def make_executable(path):
