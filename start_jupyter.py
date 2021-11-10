@@ -242,7 +242,7 @@ def main():
             if args.max_hours is None:
                 max_hours = 2 if args.gpu else 8
             else:
-                max_hours = args.max_hours
+                max_hours = int(args.max_hours)
             f.write(batch_job.format(
                 log_fn=log_fn,
                 max_hours=max_hours,
