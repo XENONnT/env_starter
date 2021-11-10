@@ -82,6 +82,7 @@ ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "h
 Happy strax analysis, {username}!
 """
 
+
 def make_executable(path):
     """Make the file at path executable, see """
     mode = os.stat(path).st_mode
@@ -120,16 +121,20 @@ def parse_arguments():
     parser.add_argument('--tag',
                         default='development',
                         help='Tagged environment to load'
-                             'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:dsg:computing:environment_tracking'
+                             'See wiki page https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:analysis:environments'   # noqa
                              'Default: "development", or -- equivalently -- "latest"')
+    parser.add_argument('--max_hours',
+                        default=None, type=float,
+                        help='Max number of hours before the job expires. Defaults to 8 h for normal jobs and 2 for GPUs.')  # noqa
     parser.add_argument('--force_new',
-        action='store_true', default=False,
-        help='Start a new job even if you already have an old one running')
+                        action='store_true', default=False,
+                        help='Start a new job even if you already have an old one running')
     parser.add_argument('--jupyter',
                         choices=['lab', 'notebook'],
                         default='lab',
                         help='Use jupyter-lab or jupyter-notebook')
-    parser.add_argument('--notebook_dir', default=os.environ['HOME'], help='The working directory passed to jupyter')
+    parser.add_argument('--notebook_dir', default=os.environ['HOME'],
+                        help='The working directory passed to jupyter')
     parser.add_argument('--copy_tutorials',
                         action='store_true',
                         help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
@@ -143,7 +148,6 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     print_flush(SPLASH_SCREEN)
-
 
     # Dir for the sbatch and log files
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -235,9 +239,11 @@ def main():
                                                                 if use_reservation else '')))
             if args.node:
                 extra_header += '\n#SBATCH --nodelist={node}'.format(node=args.node)
+            if args.max_hours is None:
+                max_hours = 2 if args.gpu else 8
             f.write(batch_job.format(
                 log_fn=log_fn,
-                max_hours=2 if args.gpu else 8,
+                max_hours=max_hours,
                 extra_header=extra_header,
                 n_cpu=args.cpu,
                 mem_per_cpu=int(args.ram / args.cpu)))
