@@ -226,7 +226,7 @@ def main():
 
         job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
         if not args.force_new:
-            log_fn = os.path.join(OUTPUT_DIR, f'notebook.log')
+            log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
         else:
             log_fn = os.path.join(OUTPUT_DIR, f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
