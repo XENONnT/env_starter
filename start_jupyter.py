@@ -85,13 +85,6 @@ Happy strax analysis, {username}!
 """
 
 
-def make_executable(path):
-    """Make the file at path executable, see """
-    mode = os.stat(path).st_mode
-    mode |= (mode & 0o444) >> 2    # copy R bits to X
-    os.chmod(path, mode)
-
-
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Start a strax jupyter notebook server on the dali batch queue')
