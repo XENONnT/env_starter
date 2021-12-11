@@ -28,7 +28,7 @@ Login to midway/dali. For directions on getting accounts
 setup etc, see [here](https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenon1t:cmp:computing:midway_cluster:instructions). 
 
 ```
-ssh {username}@dali.rcc.uchicago.edu
+ssh {username}@dali-login1.rcc.uchicago.edu
 ```
 
 Decide where you would like to put the env_starter 
