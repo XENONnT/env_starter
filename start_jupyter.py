@@ -216,11 +216,11 @@ def main():
 
         if args.ram > 16000 and not args.bypass_reservation:
             print_flush('You asked for more than 16 GB total memory you cannot use the notebook '
-                        'reservation queue for this job!')
+                        'reservation queue for this job! We will bypass the reservation.')
 
         if args.cpu >= 8 and not args.bypass_reservation:
             print_flush('You asked for more than 7 CPUs you cannot use the notebook reservation '
-                        'queue for this job!')
+                        'queue for this job! We will bypass the reservation.')
         use_reservation = (
             (not args.force_new)
             and args.partition == 'xenon1t'
