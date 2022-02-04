@@ -214,19 +214,19 @@ def main():
     else:
         print_flush("Submitting a new jupyter job")
 
-        if args.ram > 12000 and not args.bypass_reservation:
-            print_flush('You asked for more than 12 GB per CPU you cannot use the notebook '
+        if args.ram > 16000 and not args.bypass_reservation:
+            print_flush('You asked for more than 16 GB total memory you cannot use the notebook '
                         'reservation queue for this job!')
 
         if args.cpu >= 8 and not args.bypass_reservation:
-            print_flush('You asked for more than 7 CPUs you cannot use the notebook '
-                        'reservation queue for this job!')
+            print_flush('You asked for more than 7 CPUs you cannot use the notebook reservation '
+                        'queue for this job!')
         use_reservation = (
             (not args.force_new)
             and args.partition == 'xenon1t'
             and (not args.bypass_reservation)
             and args.cpu < 8
-            and args.ram <= 12000
+            and args.ram <= 16000
         )
 
         job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
