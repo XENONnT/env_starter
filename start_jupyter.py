@@ -91,7 +91,9 @@ def parse_arguments():
     parser.add_argument('--partition',
                         default='xenon1t', type=str,
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
-    parser.add_argument('--bypass_reservation', action='store_true',
+    parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
+                        dest='bypass_reservation',
+                        action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
     parser.add_argument('--timeout',
