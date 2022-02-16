@@ -57,7 +57,7 @@ module load cuda/10.1
 """
 
 CPU_HEADER = """\
-#SBATCH --qos {partition}
+#SBATCH --qos {qos}
 #SBATCH --partition {partition}
 {reservation}
 """
@@ -176,6 +176,11 @@ def main():
                      )
         print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
 
+    if args.partition == 'kicp':
+        qos = 'xenon1t-kicp'
+    else:
+        qos = args.partition
+
     url = None
     url_cache_fn = osp.join(
         os.environ['HOME'],
@@ -240,6 +245,7 @@ def main():
         with open(job_fn, mode='w') as f:
             extra_header = (GPU_HEADER if args.gpu
                             else CPU_HEADER.format(partition=args.partition,
+                                                   qos=qos,
                                                    reservation=('#SBATCH --reservation=xenon_notebook'
                                                                 if use_reservation else '')))
             if args.node:
