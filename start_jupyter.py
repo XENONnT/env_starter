@@ -91,7 +91,9 @@ def parse_arguments():
     parser.add_argument('--partition',
                         default='xenon1t', type=str,
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
-    parser.add_argument('--bypass_reservation', action='store_true',
+    parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
+                        dest='bypass_reservation',
+                        action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
     parser.add_argument('--timeout',
@@ -121,19 +123,24 @@ def parse_arguments():
     parser.add_argument('--max_hours',
                         default=None, type=float,
                         help='Max number of hours before the job expires. Defaults to 8 h for normal jobs and 2 for GPUs.')  # noqa
-    parser.add_argument('--force_new',
+    parser.add_argument('--force_new', '--force-new',
+                        dest='force_new',
                         action='store_true', default=False,
                         help='Start a new job even if you already have an old one running')
     parser.add_argument('--jupyter',
                         choices=['lab', 'notebook'],
                         default='lab',
                         help='Use jupyter-lab or jupyter-notebook')
-    parser.add_argument('--notebook_dir', default=os.environ['HOME'],
+    parser.add_argument('--notebook_dir',  '--notebook-dir',
+                        dest='notebook_dir',
+                        default=os.environ['HOME'],
                         help='The working directory passed to jupyter')
-    parser.add_argument('--copy_tutorials',
+    parser.add_argument('--copy_tutorials', '--copy-tutorials',
+                        dest='copy_tutorials',
                         action='store_true',
                         help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
-    parser.add_argument('--local_cutax',
+    parser.add_argument('--local_cutax', '--cutax', '--local-cutax',
+                        dest='local_cutax',
                         action='store_true',
                         help='Enable the usage of locally installed cutax')
 
