@@ -1,4 +1,6 @@
-#!/cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
+#!/dali/lgrandi/strax/miniconda3/envs/strax/bin/python
+
+# cvfms if offline otherwise we used /cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
 import argparse
 import os
 import os.path as osp
@@ -110,7 +112,7 @@ def parse_arguments():
                         help='Request to run on a GPU partition. Limits runtime to 2 hours.')
     parser.add_argument('--env',
                         default='singularity',
-                        choices=['singularity', 'cvmfs'],
+                        choices=['singularity', 'cvmfs', 'backup'],
                         help='Environment to activate; defaults to "singularity" '
                              'to load XENONnT singularity container. '
                              'Passing "cvmfs" will use the conda environment installed in cvmfs, '
@@ -174,10 +176,20 @@ def main():
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,
-                                                                )
+                                                                 )
     elif args.env == 'cvmfs':
         batch_job = (JOB_HEADER
                      + "source /cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag)
+                     + START_JUPYTER.format(jupyter=args.jupyter,
+                                            notebook_dir=args.notebook_dir)
+                     )
+        print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
+
+    elif args.env == 'backup':
+        if args.tag != 'development':
+            raise ValueError('I\'m going to give you the latest container, you cannot choose a version!')
+        batch_job = (JOB_HEADER
+                     + "source /dali/lgrandi/strax/miniconda3/bin/activate strax"
                      + START_JUPYTER.format(jupyter=args.jupyter,
                                             notebook_dir=args.notebook_dir)
                      )
@@ -193,7 +205,7 @@ def main():
         os.environ['HOME'],
         '.last_jupyter_url')
     username = os.environ['USER']
-    
+
     # Check if a job is already running
     q = subprocess.check_output(['squeue', '-u', username])
     jobs = [line for line in q.decode().splitlines() if 'straxlab' in line]
@@ -236,10 +248,10 @@ def main():
             print_flush('You asked for more than 7 CPUs you cannot use the notebook reservation '
                         'queue for this job! We will bypass the reservation.')
         use_reservation = (
-            (not args.force_new)
-            and _want_to_make_reservation
-            and args.cpu < 8
-            and args.ram <= 16000
+                (not args.force_new)
+                and _want_to_make_reservation
+                and args.cpu < 8
+                and args.ram <= 16000
         )
 
         job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
@@ -316,7 +328,7 @@ def main():
         token = '?token=' + token
     else:
         token = ''
-        
+
     # Check if many jobs are running
     q = subprocess.check_output(['squeue', '-u', username])
     jobs = [line for line in q.decode().splitlines() if 'straxlab' in line]
@@ -328,8 +340,8 @@ def main():
             print_flush("\t" + job)
 
     print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username))
-    
-    
+
+
 def print_flush(x):
     """Does print(x, flush=True), also in python 2.x"""
     print(x)
