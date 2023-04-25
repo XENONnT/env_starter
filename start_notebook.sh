@@ -4,7 +4,7 @@ IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 
-IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
+IMAGE_DIR='/dali/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
 if [ -e ${IMAGE_NAME} ]; then
@@ -25,11 +25,10 @@ fi
 echo "Using singularity image: ${CONTAINER}"
 
 PORT=$(( 15000 + (RANDOM %= 5000) ))
-SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
+SINGULARITY_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
 
 # script to run inside container
-DIR=$PWD
-INNER=.singularity_inner
+INNER=/dali/lgrandi/$USER/.singularity_inner
 cat > $INNER << EOF
 #!/bin/bash
 JUP_HOST=\$(hostname -i)
@@ -37,7 +36,7 @@ JUP_HOST=\$(hostname -i)
 echo -e "
     Copy/Paste this in your local terminal to ssh tunnel with remote
     -----------------------------------------------------------------
-    ssh -N -f -L localhost:$PORT:\$JUP_HOST:$PORT ${USER}@midway2.rcc.uchicago.edu
+    ssh -N -f -L localhost:$PORT:\$JUP_HOST:$PORT ${USER}@dali-login2.rcc.uchicago.edu
     -----------------------------------------------------------------
 
     Then open a browser on your local machine to the following address
@@ -55,4 +54,4 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2 --bind /scratch/midway2/$USER --bind /dali $CONTAINER $DIR/$INNER
+singularity exec --bind /project2 --bind /dali $CONTAINER $INNER

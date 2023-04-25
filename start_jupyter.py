@@ -11,11 +11,15 @@ import sys
 import time
 from random import choices
 from string import ascii_lowercase
+import getpass
 
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
 # where you want to store sbatch and log files
-OUTPUT_DIR = osp.expanduser('~/straxlab')
+OUTPUT_DIR = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser()))
+# default notebook dir
+DEFAULT_NOTEBOOK_DIR = osp.expanduser('/dali/lgrandi/%s/notebooks'%(getpass.getuser()))
+DALI_HOME = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
 
 def printflush(x):
     """Does print(x, flush=True), also in python 2.x"""
@@ -135,7 +139,7 @@ def parse_arguments():
                         help='Use jupyter-lab or jupyter-notebook')
     parser.add_argument('--notebook_dir',  '--notebook-dir',
                         dest='notebook_dir',
-                        default=os.environ['HOME'],
+                        default=DEFAULT_NOTEBOOK_DIR,
                         help='The working directory passed to jupyter')
     parser.add_argument('--copy_tutorials', '--copy-tutorials',
                         dest='copy_tutorials',
@@ -202,7 +206,7 @@ def main():
 
     url = None
     url_cache_fn = osp.join(
-        os.environ['HOME'],
+        DALI_HOME,
         '.last_jupyter_url')
     username = os.environ['USER']
 
