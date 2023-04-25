@@ -197,6 +197,7 @@ def main():
     
     # If using default value for notebook_dir, switch to the dali 
     if args.notebook_dir == os.environ['HOME']:
+        print('Your HOME directory:', HOME[args.partition])
         args.notebook_dir = HOME[args.partition]
 
     if args.env == 'singularity':
