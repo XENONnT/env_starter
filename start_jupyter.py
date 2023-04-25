@@ -16,10 +16,33 @@ import getpass
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
 # where you want to store sbatch and log files
-OUTPUT_DIR = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser()))
-# default notebook dir
-DEFAULT_NOTEBOOK_DIR = osp.expanduser('/dali/lgrandi/%s/notebooks'%(getpass.getuser()))
-DALI_HOME = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
+OUTPUT_DIR_DALI = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser()))
+OUTPUT_DIR_MIDWAY = osp.expanduser('~/straxlab')
+OUTPUT_DIR = {
+    'lgrandi': OUTPUT_DIR_MIDWAY,
+    'dali': OUTPUT_DIR_DALI,
+    'xenon1t': OUTPUT_DIR_MIDWAY,
+    'broadwl': OUTPUT_DIR_MIDWAY,
+    'kicp': OUTPUT_DIR_MIDWAY,
+}
+
+# default home directories
+HOME_MIDWAY = os.environ['HOME']
+HOME_DALI = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
+HOME = {
+    'lgrandi': HOME_MIDWAY,
+    'dali': HOME_DALI,
+    'xenon1t': HOME_MIDWAY,
+    'broadwl': HOME_MIDWAY,
+    'kicp': HOME_MIDWAY,
+}
+SHELL_SCRIPT = {
+    'lgrandi': 'start_notebook_midway3.sh',
+    'dali': 'start_notebook_dali.sh',
+    'xenon1t': 'start_notebook_midway2.sh',
+    'broadwl': 'start_notebook_midway2.sh',
+    'kicp': 'start_notebook_midway2.sh',
+}
 
 def printflush(x):
     """Does print(x, flush=True), also in python 2.x"""
@@ -96,7 +119,7 @@ def parse_arguments():
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--partition',
                         default='xenon1t', type=str,
-                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
+                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t. If you want to use midway3, then use 'lgrandi'.")
     parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
                         dest='bypass_reservation',
                         action='store_true',
@@ -139,7 +162,7 @@ def parse_arguments():
                         help='Use jupyter-lab or jupyter-notebook')
     parser.add_argument('--notebook_dir',  '--notebook-dir',
                         dest='notebook_dir',
-                        default=DEFAULT_NOTEBOOK_DIR,
+                        default=os.environ['HOME'],
                         help='The working directory passed to jupyter')
     parser.add_argument('--copy_tutorials', '--copy-tutorials',
                         dest='copy_tutorials',
@@ -171,12 +194,17 @@ def main():
             shutil.copytree(
                 '/dali/lgrandi/strax/straxen/notebooks/tutorials',
                 dest)
+    
+    # If using default value for notebook_dir, switch to the dali 
+    if args.notebook_dir == os.environ['HOME']:
+        args.notebook_dir = HOME[args.partition]
 
     if args.env == 'singularity':
         s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
-                    "{env_starter}/start_notebook.sh " \
+                    "{env_starter}/{script} " \
                     "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
+                                                                 script=SHELL_SCRIPT[args.partition],
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,
@@ -206,7 +234,7 @@ def main():
 
     url = None
     url_cache_fn = osp.join(
-        DALI_HOME,
+        HOME[args.partition],
         '.last_jupyter_url')
     username = os.environ['USER']
 
