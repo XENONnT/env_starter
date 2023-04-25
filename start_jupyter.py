@@ -202,7 +202,6 @@ def main():
 
     if args.env == 'singularity':
         s_container = 'xenonnt-%s.simg' % args.tag
-        print('Using the following shell script:', SHELL_SCRIPT[args.partition])
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
                     "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
