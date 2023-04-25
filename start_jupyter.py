@@ -211,6 +211,8 @@ def main():
                                                                  nbook_dir=args.notebook_dir,
                                                                  )
     elif args.env == 'cvmfs':
+        if args.partition == 'lgrandi':
+            raise Exception("Only singularity is supported on Midway3")
         batch_job = (JOB_HEADER
                      + "source /cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag)
                      + START_JUPYTER.format(jupyter=args.jupyter,
@@ -219,6 +221,8 @@ def main():
         print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
 
     elif args.env == 'backup':
+        if args.partition == 'lgrandi':
+            raise Exception("Only singularity is supported on Midway3")
         if args.tag != 'development':
             raise ValueError('I\'m going to give you the latest container, you cannot choose a version!')
         batch_job = (JOB_HEADER
