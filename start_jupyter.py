@@ -181,13 +181,13 @@ def main():
     print_flush(SPLASH_SCREEN)
 
     # Dir for the sbatch and log files
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(OUTPUT_DIR[args.partition], exist_ok=True)
 
     if args.local_cutax:
         os.environ['INSTALL_CUTAX'] = '0'
 
     if args.copy_tutorials:
-        dest = os.path.join(OUTPUT_DIR, 'strax_tutorials')
+        dest = os.path.join(OUTPUT_DIR[args.partition], 'strax_tutorials')
         if osp.exists(dest):
             print_flush("NOT copying tutorials, folder already exists")
         else:
