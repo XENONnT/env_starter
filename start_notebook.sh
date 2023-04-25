@@ -36,7 +36,7 @@ JUP_HOST=\$(hostname -i)
 echo -e "
     Copy/Paste this in your local terminal to ssh tunnel with remote
     -----------------------------------------------------------------
-    ssh -N -f -L localhost:$PORT:\$JUP_HOST:$PORT ${USER}@dali-login2.rcc.uchicago.edu
+    ssh -N -f -L localhost:$PORT:\$JUP_HOST:$PORT ${USER}@midway2.rcc.uchicago.edu
     -----------------------------------------------------------------
 
     Then open a browser on your local machine to the following address
@@ -54,4 +54,4 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2 --bind /dali $CONTAINER $INNER
+singularity exec --bind /project2:/project2:ro --bind /dali $CONTAINER $INNER
