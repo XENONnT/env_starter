@@ -49,12 +49,16 @@ git clone git@github.com:XENONnT/env_starter.git
 #### Testing your installation
 To test that the env_starter script is working, do the 
 following:
-- If you are on midway2 or dali login nodes, where you can submit notebooks to either dali or midway2 compute nodes:```
+- If you are on midway2 or dali login nodes, where you can submit notebooks to either dali or midway2 compute nodes:
+```
 cd env_starter
-./start_jupyter.py```
-- If you are on midway3 login nodes, where you can submit notebooks to midway3 compute nodes:```
+./start_jupyter.py
+```
+- If you are on midway3 login nodes, where you can submit notebooks to midway3 compute nodes:
+```
 cd env_starter
-python3 start_jupyter.py --partition lgrandi```
+python3 start_jupyter.py --partition lgrandi
+```
 
 You should see a nice splash screen similar to above, 
 and then a lot of output, eventually with something like 
