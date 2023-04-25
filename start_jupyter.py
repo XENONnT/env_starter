@@ -286,11 +286,11 @@ def main():
                 and args.ram <= 16000
         )
 
-        job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
+        job_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook{unique_id}.sbatch')
         if not args.force_new:
-            log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+            log_fn = os.path.join(OUTPUT_DIR[args.partition], 'notebook.log')
         else:
-            log_fn = os.path.join(OUTPUT_DIR, f'notebook_forced{unique_id}.log')
+            log_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
         with open(job_fn, mode='w') as f:
