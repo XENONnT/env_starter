@@ -4,7 +4,7 @@ IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 
-IMAGE_DIR='/dali/lgrandi/xenonnt/singularity-images'
+IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
 if [ -e ${IMAGE_NAME} ]; then
@@ -25,10 +25,11 @@ fi
 echo "Using singularity image: ${CONTAINER}"
 
 PORT=$(( 15000 + (RANDOM %= 5000) ))
-SINGULARITY_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
+SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
 
 # script to run inside container
-INNER=/dali/lgrandi/$USER/.singularity_inner
+DIR=$PWD
+INNER=.singularity_inner
 cat > $INNER << EOF
 #!/bin/bash
 JUP_HOST=\$(hostname -i)
@@ -54,4 +55,4 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2:/project2:ro --bind /dali $CONTAINER $INNER
+singularity exec --bind /project2 --bind /project --bind /scratch/midway3/$USER --bind /scratch/midway2/$USER --bind /project2/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
