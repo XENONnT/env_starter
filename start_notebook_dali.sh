@@ -52,6 +52,7 @@ echo -e "
 jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir ${NOTEBOOK_DIR} 2>&1
 EOF
 chmod +x $INNER
+export XENON_CONFIG=/dali/lgrandi/xenonnt/xenon.config 
 
 module load singularity
-singularity exec --bind /project2:/project2:ro --bind /dali $CONTAINER $INNER
+singularity exec --bind /dali $CONTAINER $INNER
