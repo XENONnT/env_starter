@@ -11,11 +11,38 @@ import sys
 import time
 from random import choices
 from string import ascii_lowercase
+import getpass
 
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
 # where you want to store sbatch and log files
-OUTPUT_DIR = osp.expanduser('~/straxlab')
+OUTPUT_DIR_DALI = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser()))
+OUTPUT_DIR_MIDWAY = osp.expanduser('~/straxlab')
+OUTPUT_DIR = {
+    'lgrandi': OUTPUT_DIR_MIDWAY,
+    'dali': OUTPUT_DIR_DALI,
+    'xenon1t': OUTPUT_DIR_MIDWAY,
+    'broadwl': OUTPUT_DIR_MIDWAY,
+    'kicp': OUTPUT_DIR_MIDWAY,
+}
+
+# default home directories
+HOME_MIDWAY = os.environ['HOME']
+HOME_DALI = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
+HOME = {
+    'lgrandi': HOME_MIDWAY,
+    'dali': HOME_DALI,
+    'xenon1t': HOME_MIDWAY,
+    'broadwl': HOME_MIDWAY,
+    'kicp': HOME_MIDWAY,
+}
+SHELL_SCRIPT = {
+    'lgrandi': 'start_notebook_midway3.sh',
+    'dali': 'start_notebook_dali.sh',
+    'xenon1t': 'start_notebook_midway2.sh',
+    'broadwl': 'start_notebook_midway2.sh',
+    'kicp': 'start_notebook_midway2.sh',
+}
 
 def printflush(x):
     """Does print(x, flush=True), also in python 2.x"""
@@ -92,7 +119,7 @@ def parse_arguments():
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--partition',
                         default='xenon1t', type=str,
-                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t.")
+                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t. If you want to use midway3, then use 'lgrandi'.")
     parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
                         dest='bypass_reservation',
                         action='store_true',
@@ -154,30 +181,38 @@ def main():
     print_flush(SPLASH_SCREEN)
 
     # Dir for the sbatch and log files
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(OUTPUT_DIR[args.partition], exist_ok=True)
 
     if args.local_cutax:
         os.environ['INSTALL_CUTAX'] = '0'
 
     if args.copy_tutorials:
-        dest = os.path.join(OUTPUT_DIR, 'strax_tutorials')
+        dest = os.path.join(OUTPUT_DIR[args.partition], 'strax_tutorials')
         if osp.exists(dest):
             print_flush("NOT copying tutorials, folder already exists")
         else:
             shutil.copytree(
                 '/dali/lgrandi/strax/straxen/notebooks/tutorials',
                 dest)
+    
+    # If using default value for notebook_dir, switch to the dali 
+    if args.notebook_dir == os.environ['HOME']:
+        print('Your HOME directory:', HOME[args.partition])
+        args.notebook_dir = HOME[args.partition]
 
     if args.env == 'singularity':
         s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
-                    "{env_starter}/start_notebook.sh " \
+                    "{env_starter}/{script} " \
                     "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
+                                                                 script=SHELL_SCRIPT[args.partition],
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,
                                                                  )
     elif args.env == 'cvmfs':
+        if args.partition == 'lgrandi':
+            raise Exception("Only singularity is supported on Midway3")
         batch_job = (JOB_HEADER
                      + "source /cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag)
                      + START_JUPYTER.format(jupyter=args.jupyter,
@@ -186,6 +221,8 @@ def main():
         print_flush("Using conda from cvmfs (%s) instead of singularity container." % (args.tag))
 
     elif args.env == 'backup':
+        if args.partition == 'lgrandi':
+            raise Exception("Only singularity is supported on Midway3")
         if args.tag != 'development':
             raise ValueError('I\'m going to give you the latest container, you cannot choose a version!')
         batch_job = (JOB_HEADER
@@ -202,7 +239,7 @@ def main():
 
     url = None
     url_cache_fn = osp.join(
-        os.environ['HOME'],
+        HOME[args.partition],
         '.last_jupyter_url')
     username = os.environ['USER']
 
@@ -254,11 +291,11 @@ def main():
                 and args.ram <= 16000
         )
 
-        job_fn = os.path.join(OUTPUT_DIR, f'notebook{unique_id}.sbatch')
+        job_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook{unique_id}.sbatch')
         if not args.force_new:
-            log_fn = os.path.join(OUTPUT_DIR, 'notebook.log')
+            log_fn = os.path.join(OUTPUT_DIR[args.partition], 'notebook.log')
         else:
-            log_fn = os.path.join(OUTPUT_DIR, f'notebook_forced{unique_id}.log')
+            log_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
         with open(job_fn, mode='w') as f:
