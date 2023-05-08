@@ -55,4 +55,4 @@ chmod +x $INNER
 export XENON_CONFIG=/dali/lgrandi/xenonnt/xenon.config 
 
 module load singularity
-singularity exec --bind /dali $CONTAINER $INNER
+singularity exec --bind /dali --bind /dali/lgrandi/xenonnt/xenon.config:/project2/lgrandi/xenonnt/xenon.config --bind /dali/lgrandi/grid_proxy/xenon_service_proxy:/project2/lgrandi/grid_proxy/xenon_service_proxy $CONTAINER $INNER
