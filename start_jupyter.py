@@ -125,7 +125,7 @@ def parse_arguments():
                         action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
-    parser.add_argument('--exclude_nodes', help="Specify nodes, which should be excluded, e.g., dali001,dali002")
+    parser.add_argument('--exclude_nodes', help="Specify nodes, which should be excluded, e.g., dali001,dali002 or dali0[28-30]")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
