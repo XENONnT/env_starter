@@ -125,6 +125,7 @@ def parse_arguments():
                         action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
+    parser.add_argument('--excluded_nodes', help="Specify nodes, which should be excluded, e.g., dali001,dali002")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
@@ -306,6 +307,8 @@ def main():
                                                                 if use_reservation else '')))
             if args.node:
                 extra_header += '\n#SBATCH --nodelist={node}'.format(node=args.node)
+            if args.excluded_nodes:
+                extra_header += '\n#SBATCH --exclude={exclude_nodes}'.format(exclude_nodes=exclude_nodes)
             if args.max_hours is None:
                 max_hours = 2 if args.gpu else 8
             else:
