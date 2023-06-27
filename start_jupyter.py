@@ -12,6 +12,15 @@ import time
 from random import choices
 from string import ascii_lowercase
 import getpass
+import socket
+
+# check which machine I am on
+hostname = socket.gethostname()
+# automatically set default partition based on hostname
+if 'midway3' in hostname:
+    default_partition = 'lgrandi'
+else:
+    default_partition = 'xenon1t'
 
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
@@ -118,7 +127,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--partition',
-                        default='xenon1t', type=str,
+                        default=default_partition, type=str,
                         help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t. If you want to use midway3, then use 'lgrandi'.")
     parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
                         dest='bypass_reservation',
