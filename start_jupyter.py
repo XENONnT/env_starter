@@ -22,6 +22,7 @@ if 'midway3' in hostname:
     on_midway3 = True
 else:
     default_partition = 'xenon1t'
+    on_midway3 = False
 
 # the path to this file
 ENVSTARTER_PATH = osp.dirname(osp.abspath(__file__))
