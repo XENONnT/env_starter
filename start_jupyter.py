@@ -19,6 +19,7 @@ hostname = socket.gethostname()
 # automatically set default partition based on hostname
 if 'midway3' in hostname:
     default_partition = 'lgrandi'
+    on_midway3 = True
 else:
     default_partition = 'xenon1t'
 
@@ -299,6 +300,7 @@ def main():
                 and _want_to_make_reservation
                 and args.cpu < 8
                 and args.ram <= 16000
+                and (not on_midway3)
         )
 
         job_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook{unique_id}.sbatch')
