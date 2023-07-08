@@ -124,6 +124,18 @@ ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "h
 Happy strax analysis, {username}!
 """
 
+SUCCESS_MESSAGE_MIDWAY3 = """
+All done! If you have linux, execute this command on your laptop:
+
+ssh -fN -L {port}:{ip}:{port} {username}@midway3.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
+
+If you have a mac, instead do:
+
+ssh -fN -L {port}:{ip}:{port} {username}@midway3.rcc.uchicago.edu && open "http://localhost:{port}/{token}"
+
+Happy strax analysis, {username}!
+"""
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -390,9 +402,11 @@ def main():
         print_flush("\nPlease consider stopping remaining straxlab jobs:")
         for job in jobs:
             print_flush("\t" + job)
-
-    print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username))
-
+    
+    if not on_midway3:
+        print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username))
+    else:
+        print_flush(SUCCESS_MESSAGE_MIDWAY3.format(ip=ip, port=port, token=token, username=username))
 
 def print_flush(x):
     """Does print(x, flush=True), also in python 2.x"""
