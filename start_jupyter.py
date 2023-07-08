@@ -1,4 +1,4 @@
-#!/dali/lgrandi/strax/miniconda3/envs/strax/bin/python
+#!/usr/bin/python3
 
 # cvfms if offline otherwise we used /cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
 import argparse
