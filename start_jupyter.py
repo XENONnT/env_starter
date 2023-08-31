@@ -303,8 +303,8 @@ def main():
 
         _want_to_make_reservation = ((args.partition == 'xenon1t' or args.partition == 'lgrandi')
                                      and (not args.bypass_reservation))
-        print_flush("You are using partition '%s' and you want to use reservation named '%s'"%(args.partition, 
-                                                                                               reservation_name))
+        print_flush("You are using partition '%s' and you can use reservation named '%s'"%(args.partition, 
+                                                                                           reservation_name))
         if args.ram > 16000 and _want_to_make_reservation:
             print_flush('You asked for more than 16 GB total memory you cannot use the notebook '
                         'reservation queue for this job! We will bypass the reservation.')
