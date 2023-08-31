@@ -20,8 +20,10 @@ hostname = socket.gethostname()
 if 'midway3' in hostname:
     default_partition = 'lgrandi'
     on_midway3 = True
+    reservation_name = 'lgrandi-jupyter'
 else:
     default_partition = 'xenon1t'
+    reservation_name = 'xenon_notebook'
     on_midway3 = False
 
 # the path to this file
@@ -299,8 +301,9 @@ def main():
     else:
         print_flush("Submitting a new jupyter job")
 
-        _want_to_make_reservation = (args.partition == 'xenon1t'
+        _want_to_make_reservation = ((args.partition == 'xenon1t' or args.partition == 'lgrandi')
                                      and (not args.bypass_reservation))
+        print_flush("You are using partition %s and you want to use reservation" % args.partition)
         if args.ram > 16000 and _want_to_make_reservation:
             print_flush('You asked for more than 16 GB total memory you cannot use the notebook '
                         'reservation queue for this job! We will bypass the reservation.')
@@ -313,7 +316,6 @@ def main():
                 and _want_to_make_reservation
                 and args.cpu < 8
                 and args.ram <= 16000
-                and (not on_midway3)
         )
 
         job_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook{unique_id}.sbatch')
@@ -327,7 +329,7 @@ def main():
             extra_header = (GPU_HEADER if args.gpu
                             else CPU_HEADER.format(partition=args.partition,
                                                    qos=qos,
-                                                   reservation=('#SBATCH --reservation=xenon_notebook'
+                                                   reservation=('#SBATCH --reservation=%s'%(reservation_name)
                                                                 if use_reservation else '')))
             if args.node:
                 extra_header += '\n#SBATCH --nodelist={node}'.format(node=args.node)
