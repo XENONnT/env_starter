@@ -1,6 +1,32 @@
-#!/dali/lgrandi/strax/miniconda3/envs/strax/bin/python
+!/bin/bash
 
-# cvfms if offline otherwise we used /cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
+potential_interpreters=(
+    "/dali/lgrandi/strax/miniconda3/envs/strax/bin/python"
+    "/cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python"
+)
+
+selected_interpreter=None
+
+for interpreter in "${potential_interpreters[@]}"; do
+    if command -v "$interpreter" &> /dev/null; then
+        selected_interpreter="$interpreter"
+        echo "Using the interpreter: $interpreter"
+        break
+    else
+        echo "Interpreter not found: $interpreter"
+    fi
+done
+
+if [ -z "$selected_interpreter" ]; then
+    # If none of the potential interpreters are found, exit
+    echo "No suitable Python interpreter found. Exiting."
+    exit 1
+fi
+
+# Run Python code using the selected interpreter
+"$selected_interpreter" - <<EOF
+
+
 import argparse
 import os
 import os.path as osp
@@ -413,3 +439,5 @@ def make_executable(path):
 
 if __name__ == '__main__':
     main()
+
+EOF
