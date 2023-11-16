@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 potential_interpreters=(
     "/dali/lgrandi/strax/miniconda3/envs/strax/bin/python"
