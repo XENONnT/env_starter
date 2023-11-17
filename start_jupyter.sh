@@ -32,12 +32,14 @@ for interpreter in "${unique_interpreters[@]}"; do
     interpreter_array+=("$interpreter")
 done
 
-# Remove duplicate paths
+# Print the interpreters
+echo "Potential interpreters:"
 for interpreter in "${interpreter_array[@]}"; do
     echo "$interpreter"
 done
 
 selected_interpreter=None
+
 
 for interpreter in "${potential_interpreters[@]}"; do
     if command -v "$interpreter" &> /dev/null; then
