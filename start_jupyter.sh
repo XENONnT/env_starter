@@ -63,4 +63,7 @@ source "$(dirname "$(readlink -f "$0")")/first_bash_script_env.sh"
 # Extract arguments passed to the shell script
 args="$@"
 
-$selected_interpreter start_jupyter.py $args
+# Get the directory of the script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+$selected_interpreter "$SCRIPT_DIR/start_jupyter.py" $args
