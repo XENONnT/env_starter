@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 #!/usr/bin/python3
 
 # cvfms if offline otherwise we used /cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python
+=======
+>>>>>>> 0aa711659030576ecbe00159dc94fe32e45cce66
 import argparse
 import os
 import os.path as osp
