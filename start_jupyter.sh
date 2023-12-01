@@ -4,7 +4,7 @@ potential_interpreters=()
 
 # Add the output of 'which python' if it exists and is not empty
 python_path=$(which python 2>/dev/null)
-if [ -n "$python_path" ] && [[ ! "$python_path" =~ "no python" ]]; then
+if [[ -n "$python_path" ]] && [[ ! "$python_path" =~ "no python" ]] && [[ "$python_version" =~ "Python 3" ]]; then
     potential_interpreters+=("$python_path")
 fi
 
