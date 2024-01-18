@@ -188,8 +188,7 @@ Host dali
 User ershockley
 Hostname dali-login1.rcc.uchicago.edu
 ```
-pairing this with [ssh-key authentication](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server), it is very 
-easy to login to midway:
+pairing this with ssh-key authentication (see [Bypass 2-factor authentication](https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenonnt:analysis:analysis_tools_team:midway_tutorial#the_midway_login_nodes)), it is very easy to login to midway:
 ``` 
 Evans-MacBook-Air:~ shocks$ ssh dali
 Last login: Mon Jul 19 10:59:02 2021 from wireless-169-228-79-134.ucsd.edu
