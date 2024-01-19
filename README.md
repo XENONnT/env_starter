@@ -20,7 +20,7 @@ most things.
 
 We strongly recommend you understand what the script is 
 doing so that if something breaks you can try to find a 
-work around without relying on someone else fixing it, 
+workaround without relying on someone else to fix it, 
 which can take time. 
 
 #### Installation
@@ -47,17 +47,17 @@ git clone git@github.com:XENONnT/env_starter.git
  
 
 #### Testing your installation
-To test that the env_starter script is working, do the 
+We recommend using `start_jupyter.sh` instead of `start_jupyter.py,` as the former checks the available Python interpreters automatically. To test that the env_starter script is working, do the 
 following:
 - If you are on midway2 or dali login nodes, where you can submit notebooks to either dali or midway2 compute nodes:
 ```
 cd env_starter
-./start_jupyter.py
+./start_jupyter.sh
 ```
 - If you are on midway3 login nodes, where you can submit notebooks to midway3 compute nodes:
 ```
 cd env_starter
-python3 start_jupyter.py --partition lgrandi
+./start_jupyter.sh --partition lgrandi
 ```
 
 You should see a nice splash screen similar to above, 
@@ -81,7 +81,7 @@ If you have a mac, instead do:
 Happy strax analysis, ershockley!
 ```
 
-These comands are what you should run *on your personal 
+These commands are what you should run *on your personal 
 laptop, not on Midway itself*. Before running those, 
 however, it is useful to understand what is happening 
 here. What this script did was submit a job to the 
@@ -113,17 +113,17 @@ What this does is setup an ssh tunnel between the machine you run those commands
 This script submits jobs to the midway cluster and so must be executed on midway itself. However, it is convenient to execute it over ssh *from your personal machine*:
 
 ```
-ssh {username}@dali.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.py
+ssh {username}@dali.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.sh
 ```
 
 You should then see the output as above and then be able to access the notebook. 
 
 #### Arguments
 There are several arguments you can pass to 
-`start_jupyter.py` to customize your job. 
+`start_jupyter.sh` to customize your job. 
 
 ```
-usage: start_jupyter.py [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
+usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
                         [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
                         [--copy_tutorials] [--local_cutax]
@@ -210,7 +210,7 @@ like the following (note this assumes you have setup the
 ssh config as above): 
 
 ``` 
-alias notebook="ssh dali /path/to/your/env_starter/start_jupyter.py"
+alias notebook="ssh dali /path/to/your/env_starter/start_jupyter.sh"
 ``` 
 
 Then on your personal machine you can then start up a 
@@ -245,7 +245,7 @@ involves one extra step. First, make the alias in your
 `~/.bashrc`, which for me looked like this: 
 
 ``` 
-alias start_notebook="/home/ershockley/nt/computing/env_starter/start_jupyter.py"
+alias start_notebook="/home/ershockley/nt/computing/env_starter/start_jupyter.sh"
 ```
 But in order for this to run via ssh you also need to 
 add this to *the very top of* your `.bashrc`:
@@ -275,5 +275,5 @@ gets written to
 which should serve as a good template to make further 
 changes. If you do this, we recommend copying your 
 customized sbatch script to a new filename, as otherwise 
-it will be overwritten next time you run `start_jupyter.py`. 
+it will be overwritten next time you run `start_jupyter.sh`. 
 
