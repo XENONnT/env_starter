@@ -47,6 +47,9 @@ git clone git@github.com:XENONnT/env_starter.git
  
 
 #### Testing your installation
+*Note: using **`./start_jupyter.py`** is already **deprecated**. So please follow the updated instructions below:*
+
+
 We recommend using `start_jupyter.sh` instead of `start_jupyter.py,` as the former checks the available Python interpreters automatically. To test that the env_starter script is working, do the 
 following:
 - If you are on midway2 or dali login nodes, where you can submit notebooks to either dali or midway2 compute nodes:
