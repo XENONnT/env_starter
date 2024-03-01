@@ -28,6 +28,7 @@ OUTPUT_DIR_DALI = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser())
 OUTPUT_DIR_MIDWAY = osp.expanduser('~/straxlab')
 OUTPUT_DIR = {
     'lgrandi': OUTPUT_DIR_MIDWAY,
+    'caslake': OUTPUT_DIR_MIDWAY,
     'dali': OUTPUT_DIR_DALI,
     'xenon1t': OUTPUT_DIR_MIDWAY,
     'broadwl': OUTPUT_DIR_MIDWAY,
@@ -39,6 +40,7 @@ HOME_MIDWAY = os.environ['HOME']
 HOME_DALI = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
 HOME = {
     'lgrandi': HOME_MIDWAY,
+    'caslake': HOME_MIDWAY,
     'dali': HOME_DALI,
     'xenon1t': HOME_MIDWAY,
     'broadwl': HOME_MIDWAY,
@@ -46,6 +48,7 @@ HOME = {
 }
 SHELL_SCRIPT = {
     'lgrandi': 'start_notebook_midway3.sh',
+    'caslake': 'start_notebook_midway3.sh',
     'dali': 'start_notebook_dali.sh',
     'xenon1t': 'start_notebook_midway2.sh',
     'broadwl': 'start_notebook_midway2.sh',
