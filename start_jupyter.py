@@ -130,7 +130,7 @@ def parse_arguments():
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--partition',
                         default=default_partition, type=str,
-                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t. If you want to use midway3, then use 'lgrandi'.")
+                        help="RCC/DALI partition to use. Try dali, broadwl, xenon1t, lgrandi, caslake or kicp. If you want to use midway3, then use 'lgrandi'.")
     parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
                         dest='bypass_reservation',
                         action='store_true',
