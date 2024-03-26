@@ -245,8 +245,7 @@ def main():
         s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
-                    "{s_container} {jupyter} {nbook_dir}" \
-                    "{partition}".format(env_starter=ENVSTARTER_PATH,
+                    "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
                                                                  script=SHELL_SCRIPT[args.partition],
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
