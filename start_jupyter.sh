@@ -59,7 +59,6 @@ fi
 
 # Run Python code using the selected interpreter with all environment variables
 export PYTHONPATH=$PYTHONPATH
-source "$(dirname "$(readlink -f "$0")")/first_bash_script_env.sh"
 # Extract arguments passed to the shell script
 args="$@"
 
