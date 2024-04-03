@@ -311,7 +311,7 @@ def main():
             log_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
-        with open(job_fn, mode='w') as f:
+        with open(job_fn, mode='w', encoding='utf-8') as f:
             extra_header = (GPU_HEADER if args.gpu
                             else CPU_HEADER.format(partition=args.partition,
                                                    qos=qos,
@@ -350,7 +350,7 @@ def main():
         slept = 0
         url = None
         while url is None and slept < args.timeout:
-            with open(log_fn, mode='r') as f:
+            with open(log_fn, mode='r', encoding='utf-8') as f:
                 content = f.readlines()
                 for line_i, line in enumerate(content):
                     if line_i >= lines_shown:
