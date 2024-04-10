@@ -24,7 +24,7 @@ fi
 
 echo "Using singularity image: ${CONTAINER}"
 
-PORT=$(( 15000 + (RANDOM %= 5000) ))
+PORT=$(( 15000 + (RANDOM %= 5000) )
 SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
 
 # script to run inside container
