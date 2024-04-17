@@ -164,7 +164,7 @@ def parse_arguments():
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
     parser.add_argument('--exclude_nodes',
-                        default="lc",
+                        default=None,
                         help="Specify nodes, which should be excluded, e.g., dali001,dali002 or dali0[28-30]")
     parser.add_argument('--timeout',
                         default=120, type=int,
