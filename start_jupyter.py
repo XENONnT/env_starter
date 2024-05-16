@@ -10,6 +10,33 @@ from random import choices
 from string import ascii_lowercase
 import getpass
 import socket
+from typing import List
+
+def _get_lc_nodes(partition: str) -> List[str]:
+    """
+    Get the list of 'lc' (loosely coupled) nodes in the specified partition.
+    
+    Args:
+        partition (str): The partition to check for 'lc' nodes.
+    
+    Returns:
+        List[str]: The list of 'lc' node names.
+    """
+    cmd = f"nodestatus {partition}"
+    try:
+        output = subprocess.check_output(cmd, universal_newlines=True, shell=True)
+        lines = output.split("\n")
+        lc_nodes = []
+        for line in lines:
+            columns = line.split()
+            if len(columns) >= 4 and "," in columns[3]:
+                features = columns[3].split(",")
+                if "lc" in features:
+                    lc_nodes.append(columns[0])
+        return lc_nodes
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while executing nodestatus: {e}")
+        return []
 
 # check which machine I am on
 hostname = socket.gethostname()
@@ -28,6 +55,7 @@ OUTPUT_DIR_DALI = osp.expanduser('/dali/lgrandi/%s/straxlab'%(getpass.getuser())
 OUTPUT_DIR_MIDWAY = osp.expanduser('~/straxlab')
 OUTPUT_DIR = {
     'lgrandi': OUTPUT_DIR_MIDWAY,
+    'build': OUTPUT_DIR_MIDWAY,
     'caslake': OUTPUT_DIR_MIDWAY,
     'dali': OUTPUT_DIR_DALI,
     'xenon1t': OUTPUT_DIR_MIDWAY,
@@ -40,6 +68,7 @@ HOME_MIDWAY = os.environ['HOME']
 HOME_DALI = osp.expanduser('/dali/lgrandi/%s'%(getpass.getuser()))
 HOME = {
     'lgrandi': HOME_MIDWAY,
+    'build': HOME_MIDWAY,
     'caslake': HOME_MIDWAY,
     'dali': HOME_DALI,
     'xenon1t': HOME_MIDWAY,
@@ -48,6 +77,7 @@ HOME = {
 }
 SHELL_SCRIPT = {
     'lgrandi': 'start_notebook_midway3.sh',
+    'build': 'start_notebook_midway3.sh',
     'caslake': 'start_notebook_midway3.sh',
     'dali': 'start_notebook_dali.sh',
     'xenon1t': 'start_notebook_midway2.sh',
@@ -130,13 +160,15 @@ def parse_arguments():
         description='Start a strax jupyter notebook server on the dali batch queue')
     parser.add_argument('--partition',
                         default=default_partition, type=str,
-                        help="RCC/DALI partition to use. Try dali, broadwl, or xenon1t. If you want to use midway3, then use 'lgrandi'.")
+                        help="RCC/DALI partition to use. Try dali, broadwl, xenon1t, lgrandi, caslake or kicp. If you want to use midway3, then use 'lgrandi'.")
     parser.add_argument('--bypass_reservation', '--bypass-reservation', '--skip_reservation', '--skip-reservation', '--no_reservation', '--no-reservation',
                         dest='bypass_reservation',
                         action='store_true',
                         help="Do not use the notebook reservation (useful if it is full)")
     parser.add_argument('--node', help="Specify a node, if desired. By default no specification made")
-    parser.add_argument('--exclude_nodes', help="Specify nodes, which should be excluded, e.g., dali001,dali002 or dali0[28-30]")
+    parser.add_argument('--exclude_nodes',
+                        default=None,
+                        help="Specify nodes, which should be excluded, e.g., dali001,dali002 or dali0[28-30]")
     parser.add_argument('--timeout',
                         default=120, type=int,
                         help='Seconds to wait for the jupyter server to start')
@@ -224,6 +256,7 @@ def main():
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,
+                                                                 partition=args.partition,
                                                                  )
     elif args.env == 'cvmfs':
         if args.partition == 'lgrandi':
@@ -314,7 +347,7 @@ def main():
             log_fn = os.path.join(OUTPUT_DIR[args.partition], f'notebook_forced{unique_id}.log')
         if os.path.exists(log_fn):
             os.remove(log_fn)
-        with open(job_fn, mode='w') as f:
+        with open(job_fn, mode='w', encoding='utf-8') as f:
             extra_header = (GPU_HEADER if args.gpu
                             else CPU_HEADER.format(partition=args.partition,
                                                    qos=qos,
@@ -323,7 +356,16 @@ def main():
             if args.node:
                 extra_header += '\n#SBATCH --nodelist={node}'.format(node=args.node)
             if args.exclude_nodes:
-                extra_header += '\n#SBATCH --exclude={exclude_nodes}'.format(exclude_nodes=args.exclude_nodes)
+                if args.exclude_nodes == 'lc':
+                    # Get the list of 'lc' nodes
+                    lc_nodes = _get_lc_nodes(args.partition)
+                    # Convert the list of 'lc' nodes to a comma-separated string
+                    exclude_nodes_str = ','.join(lc_nodes)
+                    # Append the --exclude option to the extra_header
+                    extra_header += '\n#SBATCH --exclude={exclude_nodes}'.format(exclude_nodes=exclude_nodes_str)
+                    print(f"Excluding lc nodes: {exclude_nodes_str}")
+                else:
+                    extra_header += '\n#SBATCH --exclude={exclude_nodes}'.format(exclude_nodes=args.exclude_nodes)
             if args.max_hours is None:
                 max_hours = 2 if args.gpu else 8
             else:
@@ -353,7 +395,7 @@ def main():
         slept = 0
         url = None
         while url is None and slept < args.timeout:
-            with open(log_fn, mode='r') as f:
+            with open(log_fn, mode='r', encoding='utf-8') as f:
                 content = f.readlines()
                 for line_i, line in enumerate(content):
                     if line_i >= lines_shown:
