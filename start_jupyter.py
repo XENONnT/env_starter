@@ -213,7 +213,10 @@ def main():
         args.notebook_dir = HOME[args.partition]
 
     if args.env == 'singularity':
-        s_container = 'xenonnt-%s.simg' % args.tag
+        if os.path.exists(args.tag):
+            s_container = args.tag
+        else:
+            s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
                     "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
