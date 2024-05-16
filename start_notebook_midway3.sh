@@ -55,4 +55,13 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /scratch/midway2/$USER --bind /project/lgrandi --bind /project2/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
+
+# if /scratch/midway2/$USER is not mounted, dont bind it
+
+if [ -d /scratch/midway2/$USER ]; then
+  singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /scratch/midway2/$USER --bind /project/lgrandi --bind /project2/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
+else
+  singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /project/lgrandi $CONTAINER $DIR/$INNER
+fi
+
+
