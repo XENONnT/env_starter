@@ -4,7 +4,7 @@ IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 
-IMAGE_DIR='/project2/lgrandi/xenonnt/singularity-images'
+IMAGE_DIR='/project/lgrandi/xenonnt/singularity-images'
 
 # if we passed the full path to an image, use that
 if [ -e ${IMAGE_NAME} ]; then
@@ -55,4 +55,4 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /scratch/midway2/$USER --bind /project/lgrandi --bind /project2/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
+singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /scratch/midway2/$USER --bind /project/lgrandi --bind /project/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
