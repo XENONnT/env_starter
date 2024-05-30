@@ -7,6 +7,7 @@ PARTITION=$4
 
 IMAGE_DIRS=("/project/lgrandi/xenonnt/singularity-images" "/project2/lgrandi/xenonnt/singularity-images" "/dali/lgrandi/xenonnt/singularity-images")
 
+CONTAINER=""
 # If we passed the full path to an image and it exists, use that
 if [ -e "${IMAGE_NAME}" ]; then
   CONTAINER="${IMAGE_NAME}"
@@ -19,6 +20,11 @@ else
       break
     fi
   done
+fi
+# if no container found, throw an error
+if [ -z "${CONTAINER}" ]; then
+  echo "Error: Singularity image not found. Please provide a valid image name or path."
+  exit 1
 fi
 
 if [ "x${JUPYTER_TYPE}" = "x" ]; then
