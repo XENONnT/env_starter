@@ -75,15 +75,7 @@ HOME = {
     'broadwl': HOME_MIDWAY,
     'kicp': HOME_MIDWAY,
 }
-SHELL_SCRIPT = {
-    'lgrandi': 'start_notebook_midway3.sh',
-    'build': 'start_notebook_midway3.sh',
-    'caslake': 'start_notebook_midway3.sh',
-    'dali': 'start_notebook_dali.sh',
-    'xenon1t': 'start_notebook_midway2.sh',
-    'broadwl': 'start_notebook_midway2.sh',
-    'kicp': 'start_notebook_midway2.sh',
-}
+SHELL_SCRIPT = 'start_notebook.sh'
 
 def printflush(x):
     """Does print(x, flush=True), also in python 2.x"""
@@ -249,7 +241,7 @@ def main():
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
                     "{s_container} {jupyter} {nbook_dir}".format(env_starter=ENVSTARTER_PATH,
-                                                                 script=SHELL_SCRIPT[args.partition],
+                                                                 script=SHELL_SCRIPT,
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,

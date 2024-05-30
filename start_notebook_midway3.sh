@@ -4,18 +4,20 @@ IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 
-IMAGE_DIR='/project/lgrandi/xenonnt/singularity-images'
+IMAGE_DIRS=("/project/lgrandi/xenonnt/singularity-images" "/project2/lgrandi/xenonnt/singularity-images")
 
-# if we passed the full path to an image, use that
-if [ -e ${IMAGE_NAME} ]; then
-  CONTAINER=${IMAGE_NAME}
-# otherwise check if the name exists in the standard image directory
-elif [ -e ${IMAGE_DIR}/${IMAGE_NAME} ]; then
-  CONTAINER=${IMAGE_DIR}/${IMAGE_NAME}
-# if not any of those, throw an error
+# If we passed the full path to an image and it exists, use that
+if [ -e "${IMAGE_NAME}" ]; then
+  CONTAINER="${IMAGE_NAME}"
 else
-  echo "We could not find the container at its full path ${IMAGE_NAME} or in ${IMAGE_DIR}. Exiting."
-  exit 1
+  # Loop over the list of image directoriesß
+  for IMAGE_DIR in "${IMAGE_DIRS[@]}"; do
+    # Check if the image exists in the current directory
+    if [ -e "${IMAGE_DIR}/${IMAGE_NAME}" ]; then
+      CONTAINER="${IMAGE_DIR}/${IMAGE_NAME}"
+      break
+    fi
+  done
 fi
 
 if [ "x${JUPYTER_TYPE}" = "x" ]; then
@@ -24,13 +26,13 @@ fi
 
 echo "Using singularity image: ${CONTAINER}"
 
-PORT=$(( 15000 + (RANDOM %= 5000) ))
+PORT=$((15000 + (RANDOM %= 5000)))
 SINGULARITY_CACHEDIR=/scratch/midway3/$USER/singularity_cache
 
 # script to run inside container
 DIR=$PWD
 INNER=.singularity_inner
-cat > $INNER << EOF
+cat >$INNER <<EOF
 #!/bin/bash
 JUP_HOST=\$(hostname -i)
 ## print tunneling instructions
