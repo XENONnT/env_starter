@@ -98,8 +98,5 @@ done
 # Append the container and script paths to the command string
 SINGULARITY_COMMAND+=" $CONTAINER $DIR/$INNER"
 
-# Echo the final singularity exec command
-echo "Executing: $SINGULARITY_COMMAND"
-
 # Execute the singularity command using the string
 eval "$SINGULARITY_COMMAND"
