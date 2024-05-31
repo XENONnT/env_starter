@@ -38,7 +38,7 @@ PORT=$((15000 + (RANDOM %= 5000)))
 if [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
   SINGULARITY_CACHEDIR=/scratch/midway3/$USER/singularity_cache
   SSH_HOST="midway3.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project2" "--bind /scratch/midway3/$USER" "--bind /project/lgrandi")
+  BIND_OPTS=("--bind /project2" "--bind /scratch/midway3/$USER" "--bind /project/lgrandi" "--bind /project/lgrandi/xenonnt/dali:/dali")
 elif [[ "$PARTITION" == "dali" ]]; then
   SINGULARITY_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
   SSH_HOST="dali-login2.rcc.uchicago.edu"
