@@ -55,4 +55,4 @@ EOF
 chmod +x $INNER
 
 module load singularity
-singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /project/lgrandi $CONTAINER $DIR/$INNER
+singularity exec --bind /project2 --bind /scratch/midway3/$USER --bind /project/lgrandi --bind /project/lgrandi/xenonnt/dali:/dali $CONTAINER $DIR/$INNER
