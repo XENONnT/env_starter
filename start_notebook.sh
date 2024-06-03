@@ -78,6 +78,8 @@ chmod +x $INNER
 
 if [[ "$PARTITION" == "dali" ]]; then
   export XENON_CONFIG=/dali/lgrandi/xenonnt/xenon.config
+elif [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
+  export XENON_CONFIG=/project/lgrandi/xenonnt/xenon.config
 fi
 
 module load singularity
