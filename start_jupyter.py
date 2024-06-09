@@ -208,6 +208,9 @@ def parse_arguments():
                         dest='local_cutax',
                         action='store_true',
                         help='Enable the usage of locally installed cutax')
+    parser.add_argument('--xenon_config', '--xenon-config',
+                        default=None,
+                        help='Enter the path of your xenon_config file if you want to replace the public one.')
 
     return parser.parse_args()
 
@@ -240,12 +243,13 @@ def main():
         s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
-                    "{s_container} {jupyter} {nbook_dir} {partition}".format(env_starter=ENVSTARTER_PATH,
+                    "{s_container} {jupyter} {nbook_dir} {partition} {xenon_config}".format(env_starter=ENVSTARTER_PATH,
                                                                  script=SHELL_SCRIPT,
                                                                  s_container=s_container,
                                                                  jupyter=args.jupyter,
                                                                  nbook_dir=args.notebook_dir,
                                                                  partition=args.partition,
+                                                                 xenon_config=args.xenon_config
                                                                  )
     elif args.env == 'cvmfs':
         if args.partition == 'lgrandi':

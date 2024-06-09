@@ -4,6 +4,7 @@ IMAGE_NAME=$1
 JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 PARTITION=$4
+XENON_CONFIG=$5
 
 IMAGE_DIRS=("/project/lgrandi/xenonnt/singularity-images" "/project2/lgrandi/xenonnt/singularity-images" "/dali/lgrandi/xenonnt/singularity-images")
 
@@ -76,11 +77,35 @@ jupyter ${JUPYTER_TYPE} --no-browser --port=$PORT --ip=\$JUP_HOST --notebook-dir
 EOF
 chmod +x $INNER
 
-if [[ "$PARTITION" == "dali" ]]; then
-  export XENON_CONFIG=/dali/lgrandi/xenonnt/xenon.config
-elif [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
-  export XENON_CONFIG=/project/lgrandi/xenonnt/xenon.config
+# Set default XENON_CONFIG path based on PARTITION
+case "$PARTITION" in
+  "dali")
+    DEFAULT_CONFIG="/dali/lgrandi/xenonnt/xenon.config"
+    ;;
+  "lgrandi" | "build" | "caslake")
+    DEFAULT_CONFIG="/project/lgrandi/xenonnt/xenon.config"
+    ;;
+  *)
+    echo "No xenon_config set, and no default path available for the partition: $PARTITION"
+    exit 1
+    ;;
+esac
+
+# Check if XENON_CONFIG is provided and not "None"
+if [[ -z "$XENON_CONFIG" || "$XENON_CONFIG" == "None" ]]; then
+  XENON_CONFIG="$DEFAULT_CONFIG"
+  echo "No xenon_config provided, using the default: $XENON_CONFIG"
+else
+  echo "Using provided xenon_config: $XENON_CONFIG"
 fi
+
+# Check if XENON_CONFIG file exists
+if [[ ! -f "$XENON_CONFIG" ]]; then
+  echo "Error: xenon_config file not found at $XENON_CONFIG"
+  exit 1
+fi
+
+export XENON_CONFIG
 
 module load singularity
 
