@@ -79,16 +79,26 @@ chmod +x $INNER
 
 # Set default XENON_CONFIG path based on PARTITION
 case "$PARTITION" in
-  "dali")
-    DEFAULT_CONFIG="/dali/lgrandi/xenonnt/xenon.config"
-    ;;
-  "lgrandi" | "build" | "caslake")
-    DEFAULT_CONFIG="/project/lgrandi/xenonnt/xenon.config"
-    ;;
-  *)
-    echo "No xenon_config set, and no default path available for the partition: $PARTITION"
+"dali")
+  DEFAULT_CONFIG="/dali/lgrandi/xenonnt/xenon.config"
+  ;;
+"lgrandi" | "build" | "caslake" | "xenon1t" | "broadwl" | "kicp")
+  DEFAULT_CONFIG_LIST=("/project/lgrandi/xenonnt/xenon.config" "/project2/lgrandi/xenonnt/xenon.config")
+  for config in "${DEFAULT_CONFIG_LIST[@]}"; do
+    if [[ -f "$config" ]]; then
+      DEFAULT_CONFIG="$config"
+      break
+    fi
+  done
+  if [[ -z "$DEFAULT_CONFIG" ]]; then
+    echo "Error: No xenon_config set, and no default xenon_config file found at $DEFAULT_CONFIG_LIST"
     exit 1
-    ;;
+  fi
+  ;;
+*)
+  echo "Error: No xenon_config set, and no default path available for the partition: $PARTITION"
+  exit 1
+  ;;
 esac
 
 # Check if XENON_CONFIG is provided and not "None"
