@@ -82,7 +82,7 @@ case "$PARTITION" in
 "dali")
   DEFAULT_CONFIG="/dali/lgrandi/xenonnt/xenon.config"
   ;;
-"lgrandi" | "build" | "caslake" | "xenon1t" | "broadwl" | "kicp" | "bigmem2" | "gpu2")
+"lgrandi" | "build" | "caslake" | "xenon1t" | "broadwl" | "kicp" | "bigmem2")
   DEFAULT_CONFIG_LIST=("/project/lgrandi/xenonnt/xenon.config" "/project2/lgrandi/xenonnt/xenon.config")
   for config in "${DEFAULT_CONFIG_LIST[@]}"; do
     if [[ -f "$config" ]]; then

@@ -62,7 +62,6 @@ OUTPUT_DIR = {
     'broadwl': OUTPUT_DIR_MIDWAY,
     'kicp': OUTPUT_DIR_MIDWAY,
     'bigmem2': OUTPUT_DIR_MIDWAY,
-    'gpu2': OUTPUT_DIR_MIDWAY,
 }
 
 # default home directories
@@ -77,7 +76,6 @@ HOME = {
     'broadwl': HOME_MIDWAY,
     'kicp': HOME_MIDWAY,
     'bigmem2': HOME_MIDWAY,
-    'gpu2': HOME_MIDWAY,
 }
 SHELL_SCRIPT = 'start_notebook.sh'
 
