@@ -61,6 +61,8 @@ OUTPUT_DIR = {
     'xenon1t': OUTPUT_DIR_MIDWAY,
     'broadwl': OUTPUT_DIR_MIDWAY,
     'kicp': OUTPUT_DIR_MIDWAY,
+    'bigmem2': OUTPUT_DIR_MIDWAY,
+    'gpu2': OUTPUT_DIR_MIDWAY,
 }
 
 # default home directories
@@ -74,6 +76,8 @@ HOME = {
     'xenon1t': HOME_MIDWAY,
     'broadwl': HOME_MIDWAY,
     'kicp': HOME_MIDWAY,
+    'bigmem2': HOME_MIDWAY,
+    'gpu2': HOME_MIDWAY,
 }
 SHELL_SCRIPT = 'start_notebook.sh'
 
