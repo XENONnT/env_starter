@@ -175,7 +175,9 @@ rucio-related commands.
 The `--tag` argument is used to specify which tag of 
 base_environmnent to use. This applies to both the 
 singularity and cvmfs environments. It defaults to 
-`development`, the most up-to-date env.
+`development`, the most up-to-date env. 
+
+A partition equipped with GPU, for example, `gpu2`, doesn't guarantee access to GPU. Without `--gpu`, you will get a CPU-only notebook. So remember to include it if you need to use GPU.
 
 If you are developing `cutax` and want to use your local installation, you can add `--local_cutax`.  
 
