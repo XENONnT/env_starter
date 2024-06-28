@@ -55,6 +55,11 @@ DIR=$PWD
 INNER=.singularity_inner
 cat >$INNER <<EOF
 #!/bin/bash
+if [[ -n "\$SINGULARITYENV_XENON_CONFIG" && -f "\$SINGULARITYENV_XENON_CONFIG" ]]; then
+    export XENON_CONFIG="\$SINGULARITYENV_XENON_CONFIG"
+    echo "Forcibly set XENON_CONFIG inside container to: \$XENON_CONFIG"
+fi
+
 JUP_HOST=\$(hostname -i)
 ## print tunneling instructions
 echo -e "
@@ -82,45 +87,62 @@ case "$PARTITION" in
 "dali")
   DEFAULT_CONFIG="/dali/lgrandi/xenonnt/xenon.config"
   ;;
-"lgrandi" | "build" | "caslake" | "xenon1t" | "broadwl" | "kicp" | "bigmem2" | "gpu2")
-  DEFAULT_CONFIG_LIST=("/project/lgrandi/xenonnt/xenon.config" "/project2/lgrandi/xenonnt/xenon.config")
-  for config in "${DEFAULT_CONFIG_LIST[@]}"; do
-    if [[ -f "$config" ]]; then
-      DEFAULT_CONFIG="$config"
-      break
-    fi
-  done
-  if [[ -z "$DEFAULT_CONFIG" ]]; then
-    echo "Error: No xenon_config set, and no default xenon_config file found at $DEFAULT_CONFIG_LIST"
-    exit 1
-  fi
+"lgrandi" | "caslake" | "build")
+  DEFAULT_CONFIG="/project/lgrandi/xenonnt/xenon.config"
+  ;;
+"xenon1t" | "broadwl" | "kicp" | "bigmem2" | "gpu2")
+  DEFAULT_CONFIG="/project2/lgrandi/xenonnt/xenon.config"
   ;;
 *)
-  echo "Error: No xenon_config set, and no default path available for the partition: $PARTITION"
-  exit 1
+  DEFAULT_CONFIG=""
   ;;
 esac
 
-# Check if XENON_CONFIG is provided and not "None"
-if [[ -z "$XENON_CONFIG" || "$XENON_CONFIG" == "None" ]]; then
-  XENON_CONFIG="$DEFAULT_CONFIG"
-  echo "No xenon_config provided, using the default: $XENON_CONFIG"
+# Check if user-provided XENON_CONFIG exists
+if [[ -n "$XENON_CONFIG" && "$XENON_CONFIG" != "None" ]]; then
+  if [[ -f "$XENON_CONFIG" ]]; then
+    echo "Using provided xenon_config: $XENON_CONFIG"
+  else
+    echo "Warning: Provided xenon_config file not found at $XENON_CONFIG"
+    XENON_CONFIG=""
+  fi
 else
-  echo "Using provided xenon_config: $XENON_CONFIG"
+  echo "No xenon_config provided by user."
+  XENON_CONFIG=""
 fi
 
-# Check if XENON_CONFIG file exists
-if [[ ! -f "$XENON_CONFIG" ]]; then
-  echo "Error: xenon_config file not found at $XENON_CONFIG"
-  exit 1
+XENON_CONFIG_OVERRIDE=""
+if [[ -n "$XENON_CONFIG" && -f "$XENON_CONFIG" ]]; then
+    XENON_CONFIG=$(realpath "$XENON_CONFIG")
+    XENON_CONFIG_OVERRIDE="export XENON_CONFIG='$XENON_CONFIG' &&"
+    echo "Will override XENON_CONFIG in container with: $XENON_CONFIG"
 fi
 
-export XENON_CONFIG
+# If user-provided XENON_CONFIG is not valid, try to use DEFAULT_CONFIG
+if [[ -z "$XENON_CONFIG" ]]; then
+  if [[ -n "$DEFAULT_CONFIG" ]]; then
+    if [[ -f "$DEFAULT_CONFIG" ]]; then
+      echo "Using default xenon_config: $DEFAULT_CONFIG"
+    else
+      echo "Error: Default xenon_config file not found at $DEFAULT_CONFIG"
+    fi
+  else
+    echo "Error: No default xenon_config path available for the partition: $PARTITION"
+  fi
+fi
 
 module load singularity
 
-# Initialize an empty string to store the singularity exec command
-SINGULARITY_COMMAND="singularity exec"
+# Construct the Singularity command
+if [[ -n "$XENON_CONFIG" && -f "$XENON_CONFIG" ]]; then
+    export SINGULARITYENV_XENON_CONFIG="$XENON_CONFIG"
+    XENON_CONFIG_BIND="--bind $XENON_CONFIG:$XENON_CONFIG"
+else
+    XENON_CONFIG_BIND=""
+fi
+
+SINGULARITY_COMMAND="singularity exec -e $XENON_CONFIG_BIND"
+SINGULARITY_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
 
 # Check each bind path and add valid ones to the command string
 for bind_opt in "${BIND_OPTS[@]}"; do
@@ -135,5 +157,5 @@ done
 # Append the container and script paths to the command string
 SINGULARITY_COMMAND+=" $CONTAINER $DIR/$INNER"
 
-# Execute the singularity command using the string
+# Execute the singularity command
 eval "$SINGULARITY_COMMAND"
