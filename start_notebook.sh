@@ -141,8 +141,12 @@ else
     XENON_CONFIG_BIND=""
 fi
 
-SINGULARITY_COMMAND="singularity exec -e $XENON_CONFIG_BIND"
-SINGULARITY_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+SINGULARITY_COMMAND="singularity exec -e"
+
+# Add the XENON_CONFIG bind option if it exists
+if [[ -n "$XENON_CONFIG_BIND" ]]; then
+    SINGULARITY_COMMAND+=" $XENON_CONFIG_BIND"
+fi
 
 # Check each bind path and add valid ones to the command string
 for bind_opt in "${BIND_OPTS[@]}"; do
@@ -155,7 +159,7 @@ for bind_opt in "${BIND_OPTS[@]}"; do
 done
 
 # Append the container and script paths to the command string
-SINGULARITY_COMMAND+=" $CONTAINER $DIR/$INNER"
+SINGULARITY_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
 
 # Execute the singularity command
 eval "$SINGULARITY_COMMAND"
