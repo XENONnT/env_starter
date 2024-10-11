@@ -141,7 +141,7 @@ else
     XENON_CONFIG_BIND=""
 fi
 
-SINGULARITY_COMMAND="singularity exec -e"
+SINGULARITY_COMMAND="singularity exec "
 
 # Add the XENON_CONFIG bind option if it exists
 if [[ -n "$XENON_CONFIG_BIND" ]]; then
