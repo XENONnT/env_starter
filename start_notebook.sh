@@ -24,7 +24,7 @@ else
 fi
 # if no container found, throw an error
 if [ -z "${CONTAINER}" ]; then
-  echo "Error: Singularity image not found. Please provide a valid image name or path."
+  echo "Error: Container image not found. Please provide a valid image name or path."
   exit 1
 fi
 
@@ -32,20 +32,27 @@ if [ "x${JUPYTER_TYPE}" = "x" ]; then
   JUPYTER_TYPE='lab'
 fi
 
-echo "Using singularity image: ${CONTAINER}"
+# Determine whether to use singularity or apptainer based on hostname
+if [[ $(hostname) == *"midway3"* ]]; then
+  CONTAINER_CMD="apptainer"
+  echo "Using apptainer image: ${CONTAINER}"
+else
+  CONTAINER_CMD="singularity"
+  echo "Using singularity image: ${CONTAINER}"
+fi
 
 PORT=$((15000 + (RANDOM %= 5000)))
 
 if [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
-  SINGULARITY_CACHEDIR=/scratch/midway3/$USER/singularity_cache
+  CONTAINER_CACHEDIR=/scratch/midway3/$USER/singularity_cache
   SSH_HOST="midway3.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project2" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
+  BIND_OPTS=("--bind /project" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /home/$USER")
 elif [[ "$PARTITION" == "dali" ]]; then
-  SINGULARITY_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
+  CONTAINER_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
   SSH_HOST="dali-login2.rcc.uchicago.edu"
   BIND_OPTS=("--bind /dali" "--bind /dali/lgrandi/xenonnt/xenon.config:/project2/lgrandi/xenonnt/xenon.config" "--bind /dali/lgrandi/grid_proxy/xenon_service_proxy:/project2/lgrandi/grid_proxy/xenon_service_proxy")
 else
-  SINGULARITY_CACHEDIR=/scratch/midway2/$USER/singularity_cache
+  CONTAINER_CACHEDIR=/scratch/midway2/$USER/singularity_cache
   SSH_HOST="midway2.rcc.uchicago.edu"
   BIND_OPTS=("--bind /project2" "--bind /cvmfs" "--bind /project" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
 fi
@@ -131,35 +138,44 @@ if [[ -z "$XENON_CONFIG" ]]; then
   fi
 fi
 
-module load singularity
+# Load the appropriate container module based on the system
+if [[ "$CONTAINER_CMD" == "apptainer" ]]; then
+  module load apptainer
+else
+  module load singularity
+fi
 
-# Construct the Singularity command
+# Configure container environment variables
 if [[ -n "$XENON_CONFIG" && -f "$XENON_CONFIG" ]]; then
-    export SINGULARITYENV_XENON_CONFIG="$XENON_CONFIG"
+    if [[ "$CONTAINER_CMD" == "apptainer" ]]; then
+        export APPTAINERENV_XENON_CONFIG="$XENON_CONFIG"
+    else
+        export SINGULARITYENV_XENON_CONFIG="$XENON_CONFIG"
+    fi
     XENON_CONFIG_BIND="--bind $XENON_CONFIG:$XENON_CONFIG"
 else
     XENON_CONFIG_BIND=""
 fi
 
-SINGULARITY_COMMAND="singularity exec "
+CONTAINER_COMMAND="$CONTAINER_CMD exec "
 
 # Add the XENON_CONFIG bind option if it exists
 if [[ -n "$XENON_CONFIG_BIND" ]]; then
-    SINGULARITY_COMMAND+=" $XENON_CONFIG_BIND"
+    CONTAINER_COMMAND+=" $XENON_CONFIG_BIND"
 fi
 
 # Check each bind path and add valid ones to the command string
 for bind_opt in "${BIND_OPTS[@]}"; do
   bind_path=$(echo "$bind_opt" | cut -d':' -f1 | sed 's/--bind //')
   if [ -e "$bind_path" ]; then
-    SINGULARITY_COMMAND+=" $bind_opt"
+    CONTAINER_COMMAND+=" $bind_opt"
   else
     echo "Warning: Bind path '$bind_path' does not exist. Skipping."
   fi
 done
 
 # Append the container and script paths to the command string
-SINGULARITY_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
 
-# Execute the singularity command
-eval "$SINGULARITY_COMMAND"
+# Execute the container command
+eval "$CONTAINER_COMMAND"
