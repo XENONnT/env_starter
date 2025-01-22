@@ -169,7 +169,7 @@ fi
 for bind_opt in "${BIND_OPTS[@]}"; do
   bind_path=$(echo "$bind_opt" | cut -d':' -f1 | sed 's/--bind //')
   if [ -e "$bind_path" ]; then
-    CONTAINER_COMMAND+="$bind_opt"
+    CONTAINER_COMMAND+=" $bind_opt"
   else
     echo "Warning: Bind path '$bind_path' does not exist. Skipping."
   fi
