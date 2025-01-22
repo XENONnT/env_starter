@@ -177,13 +177,6 @@ done
 
 # Append the container and script paths to the command string
 CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
-
-echo "Checking directories..."
-ls /home/$USER || echo "Directory /home/$USER not accessible"
-ls /project/lgrandi || echo "Directory /project/lgrandi not accessible"
-ls /project2/lgrandi || echo "Directory /project2/lgrandi not accessible"
-ls /dali/lgrandi || echo "Directory /dali/lgrandi not accessible"
-
 echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command
