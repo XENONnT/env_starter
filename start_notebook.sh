@@ -46,7 +46,7 @@ PORT=$((15000 + (RANDOM %= 5000)))
 if [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
   CONTAINER_CACHEDIR=/scratch/midway3/$USER/singularity_cache
   SSH_HOST="midway3.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /home/$USER")
+  BIND_OPTS=("--bind /project2" "--bind /cvmfs" "--bind /project" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER")
 elif [[ "$PARTITION" == "dali" ]]; then
   CONTAINER_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
   SSH_HOST="dali-login2.rcc.uchicago.edu"
@@ -162,13 +162,14 @@ CONTAINER_COMMAND="$CONTAINER_CMD exec "
 # Add the XENON_CONFIG bind option if it exists
 if [[ -n "$XENON_CONFIG_BIND" ]]; then
     CONTAINER_COMMAND+=" $XENON_CONFIG_BIND"
+    echo "Adding $XENON_CONFIG_BIND"
 fi
 
 # Check each bind path and add valid ones to the command string
 for bind_opt in "${BIND_OPTS[@]}"; do
   bind_path=$(echo "$bind_opt" | cut -d':' -f1 | sed 's/--bind //')
   if [ -e "$bind_path" ]; then
-    CONTAINER_COMMAND+=" $bind_opt"
+    CONTAINER_COMMAND+="$bind_opt"
   else
     echo "Warning: Bind path '$bind_path' does not exist. Skipping."
   fi
@@ -176,6 +177,14 @@ done
 
 # Append the container and script paths to the command string
 CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+
+echo "Checking directories..."
+ls /home/$USER || echo "Directory /home/$USER not accessible"
+ls /project/lgrandi || echo "Directory /project/lgrandi not accessible"
+ls /project2/lgrandi || echo "Directory /project2/lgrandi not accessible"
+ls /dali/lgrandi || echo "Directory /dali/lgrandi not accessible"
+
+echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command
 eval "$CONTAINER_COMMAND"
