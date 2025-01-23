@@ -46,7 +46,7 @@ PORT=$((15000 + (RANDOM %= 5000)))
 if [[ "$PARTITION" == "lgrandi" || "$PARTITION" == "build" || "$PARTITION" == "caslake" ]]; then
   CONTAINER_CACHEDIR=/scratch/midway3/$USER/singularity_cache
   SSH_HOST="midway3.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /home/$USER")
+  BIND_OPTS=("--bind /project" "--bind /project2" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /home/$USER")
 elif [[ "$PARTITION" == "dali" ]]; then
   CONTAINER_CACHEDIR=/dali/lgrandi/$USER/singularity_cache
   SSH_HOST="dali-login2.rcc.uchicago.edu"
@@ -54,7 +54,7 @@ elif [[ "$PARTITION" == "dali" ]]; then
 else
   CONTAINER_CACHEDIR=/scratch/midway2/$USER/singularity_cache
   SSH_HOST="midway2.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project2" "--bind /cvmfs" "--bind /project" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
+  BIND_OPTS=("--bind /project" "--bind /project2" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
 fi
 
 # script to run inside container
@@ -176,6 +176,7 @@ done
 
 # Append the container and script paths to the command string
 CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command
 eval "$CONTAINER_COMMAND"
