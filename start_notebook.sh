@@ -54,7 +54,7 @@ elif [[ "$PARTITION" == "dali" ]]; then
 else
   CONTAINER_CACHEDIR=/scratch/midway2/$USER/singularity_cache
   SSH_HOST="midway2.rcc.uchicago.edu"
-  BIND_OPTS=("--bind /project2" "--bind /cvmfs" "--bind /project" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
+  BIND_OPTS=("--bind /project" "--bind /project2" "--bind /cvmfs" "--bind /scratch/midway3/$USER" "--bind /scratch/midway2/$USER" "--bind /project2/lgrandi/xenonnt/dali:/dali")
 fi
 
 # script to run inside container
@@ -176,6 +176,7 @@ done
 
 # Append the container and script paths to the command string
 CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command
 eval "$CONTAINER_COMMAND"
