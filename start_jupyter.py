@@ -234,9 +234,20 @@ def main():
         if osp.exists(dest):
             print_flush("NOT copying tutorials, folder already exists")
         else:
-            shutil.copytree(
+            # Define possible paths for the tutorials
+            tutorial_paths = [
                 '/dali/lgrandi/strax/straxen/notebooks/tutorials',
-                dest)
+                '/project2/lgrandi/strax/straxen/notebooks/tutorials'
+            ]
+
+            # Try to find an existing tutorial path
+            source = next((path for path in tutorial_paths if osp.exists(path)), None)
+
+            if source:
+                shutil.copytree(source, dest)
+                print_flush(f"Copied tutorials from {source} to {dest}")
+            else:
+                print_flush("ERROR: No valid tutorial path found. Check if the tutorial directories exist.")
     
     # If using default value for notebook_dir, switch to the dali 
     if args.notebook_dir == os.environ['HOME']:
