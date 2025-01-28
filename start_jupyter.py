@@ -228,7 +228,10 @@ def main():
 
     if args.local_cutax:
         os.environ['INSTALL_CUTAX'] = '0'
-
+        CUTAX_LOCATION=""
+    elif (not args.local_cutax) and (args.env == 'singularity'):
+        CUTAX_LOCATION = get_valid_cutax_path("/cvmfs/xenon.opensciencegrid.org/releases/nT/%s/setup.sh" % (args.tag))
+    
     if args.copy_tutorials:
         dest = os.path.join(OUTPUT_DIR[args.partition], 'strax_tutorials')
         if osp.exists(dest):
@@ -247,14 +250,16 @@ def main():
         s_container = 'xenonnt-%s.simg' % args.tag
         batch_job = JOB_HEADER + \
                     "{env_starter}/{script} " \
-                    "{s_container} {jupyter} {nbook_dir} {partition} {xenon_config}".format(env_starter=ENVSTARTER_PATH,
-                                                                 script=SHELL_SCRIPT,
-                                                                 s_container=s_container,
-                                                                 jupyter=args.jupyter,
-                                                                 nbook_dir=args.notebook_dir,
-                                                                 partition=args.partition,
-                                                                 xenon_config=args.xenon_config
-                                                                 )
+                    "{s_container} {jupyter} {nbook_dir} {partition} {xenon_config} {cutax_location}".format(env_starter=ENVSTARTER_PATH,
+                                                                                                             script=SHELL_SCRIPT,
+                                                                                                             s_container=s_container,
+                                                                                                             jupyter=args.jupyter,
+                                                                                                             nbook_dir=args.notebook_dir,
+                                                                                                             partition=args.partition,
+                                                                                                             xenon_config=args.xenon_config,
+                                                                                                             cutax_location=CUTAX_LOCATION,
+                                                                                                            )
+        
     elif args.env == 'cvmfs':
         if args.partition == 'lgrandi':
             raise Exception("Only singularity is supported on Midway3")
@@ -452,6 +457,29 @@ def make_executable(path):
     mode |= (mode & 0o444) >> 2    # copy R bits to X
     os.chmod(path, mode)
 
+def get_valid_cutax_path(setup_file_path):
+    """
+    Reads a setup file, checks for valid CUTAX paths, and returns the first valid path.
+    Args: setup_file_path (str): Path to the setup.sh file.
+    Returns: str or None: The first valid CUTAX path, or None if no valid path is found.
+    """        
+    try:
+        with open(setup_file_path, 'r') as file:
+            for line in file:
+                if "CUTAX_DIR=" in line:
+                    path = line.split('=')[1].strip()
+                    if "development" in setup_file_path:
+                        # If "development" check "latest" cutax
+                        path = "/".join(path.split('/')[:-1]) + "/latest"                        
+                    if os.path.exists(path):
+                        print(f"Valid CUTAX path found: {path}")
+                        return path    
+    except FileNotFoundError:
+        print(f"Error: File {setup_file_path} not found.")
+        return ""
+        
+    print("No valid CUTAX path found.")
+    return ""
 
 if __name__ == '__main__':
     main()
