@@ -5,6 +5,7 @@ JUPYTER_TYPE=$2
 NOTEBOOK_DIR=$3
 PARTITION=$4
 XENON_CONFIG=$5
+CUTAX_LOCATION=$6
 
 IMAGE_DIRS=("/project/lgrandi/xenonnt/singularity-images" "/project2/lgrandi/xenonnt/singularity-images" "/dali/lgrandi/xenonnt/singularity-images")
 
@@ -174,8 +175,15 @@ for bind_opt in "${BIND_OPTS[@]}"; do
   fi
 done
 
-# Append the container and script paths to the command string
-CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+
+# Check if CUTAX_LOCATION is not empty, then append the export command
+if [ -n "$CUTAX_LOCATION" ]; then
+  CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c 'export PYTHONPATH=\"$CUTAX_LOCATION:$PYTHONPATH\"; $XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+else
+  # If CUTAX_LOCATION is empty, execute only the XENON_CONFIG_OVERRIDE command
+  CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+fi
+
 echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command

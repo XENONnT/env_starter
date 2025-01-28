@@ -179,7 +179,8 @@ singularity and cvmfs environments. It defaults to
 
 A partition equipped with GPU, for example, `gpu2`, doesn't guarantee access to GPU. Without `--gpu`, you will get a CPU-only notebook. So remember to include it if you need to use GPU.
 
-If you are developing `cutax` and want to use your local installation, you can add `--local_cutax`.  
+> [!IMPORTANT]
+> If you are developing `cutax` and want to use your local installation, you can add `--local_cutax`.  
 
 ### Convenient shortcuts
 A general guidance about using ssh key could be found here: [ssh-key authentication](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server)
