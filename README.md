@@ -181,7 +181,7 @@ A partition equipped with GPU, for example, `gpu2`, doesn't guarantee access to 
 If you are developing `cutax` and want to use your local installation, you can set environmental variables:
 
 ```
-export CUTAX_LOCATION=/home/`whoami`/cutax
+export CUTAX_LOCATION=wherever_is_you_cutax  # usually /home/`whoami`/cutax
 export APPTAINERENV_CUTAX_LOCATION=$CUTAX_LOCATION
 export SINGULARITYENV_CUTAX_LOCATION=$CUTAX_LOCATION
 ```
