@@ -157,7 +157,7 @@ else
     XENON_CONFIG_BIND=""
 fi
 
-CONTAINER_COMMAND="$CONTAINER_CMD exec "
+CONTAINER_COMMAND="$CONTAINER_CMD exec"
 
 # Add the XENON_CONFIG bind option if it exists
 if [[ -n "$XENON_CONFIG_BIND" ]]; then
@@ -175,7 +175,7 @@ for bind_opt in "${BIND_OPTS[@]}"; do
 done
 
 # Append the container and script paths to the command string
-CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE $DIR/$INNER'"
+CONTAINER_COMMAND+=" $CONTAINER /bin/bash -c '$XENON_CONFIG_OVERRIDE$DIR/$INNER'"
 echo "Comand: $CONTAINER_COMMAND"
 
 # Execute the container command
