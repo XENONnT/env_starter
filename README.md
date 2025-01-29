@@ -129,7 +129,7 @@ There are several arguments you can pass to
 usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
                         [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
-                        [--copy_tutorials] [--local_cutax]
+                        [--copy_tutorials]
 
 Start a strax jupyter notebook server on the dali batch queue
 
@@ -156,7 +156,6 @@ optional arguments:
   --notebook_dir NOTEBOOK_DIR
                         The working directory passed to jupyter
   --copy_tutorials      Copy tutorials to ~/strax_tutorials (if it does not exist)
-  --local_cutax         enable the usage of local installation of cutax
 
 ```
 
@@ -179,7 +178,15 @@ singularity and cvmfs environments. It defaults to
 
 A partition equipped with GPU, for example, `gpu2`, doesn't guarantee access to GPU. Without `--gpu`, you will get a CPU-only notebook. So remember to include it if you need to use GPU.
 
-If you are developing `cutax` and want to use your local installation, you can add `--local_cutax`.  
+If you are developing `cutax` and want to use your local installation, you can set environmental variables:
+
+```
+export CUTAX_LOCATION=/home/`whoami`/cutax
+export APPTAINERENV_CUTAX_LOCATION=$CUTAX_LOCATION
+export SINGULARITYENV_CUTAX_LOCATION=$CUTAX_LOCATION
+```
+
+Note `APPTAINERENV_CUTAX_LOCATION`(`SINGULARITYENV_CUTAX_LOCATION`) is needed becasue container cleans environmental variables before running.
 
 ### Convenient shortcuts
 A general guidance about using ssh key could be found here: [ssh-key authentication](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server)
