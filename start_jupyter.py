@@ -208,10 +208,6 @@ def parse_arguments():
                         dest='copy_tutorials',
                         action='store_true',
                         help='Copy tutorials to ~/strax_tutorials (if it does not exist)')
-    parser.add_argument('--local_cutax', '--cutax', '--local-cutax',
-                        dest='local_cutax',
-                        action='store_true',
-                        help='Enable the usage of locally installed cutax')
     parser.add_argument('--xenon_config', '--xenon-config',
                         default=None,
                         help='Enter the path of your xenon_config file if you want to replace the public one.')
@@ -225,9 +221,6 @@ def main():
 
     # Dir for the sbatch and log files
     os.makedirs(OUTPUT_DIR[args.partition], exist_ok=True)
-
-    if args.local_cutax:
-        os.environ['INSTALL_CUTAX'] = '0'
 
     if args.copy_tutorials:
         dest = os.path.join(OUTPUT_DIR[args.partition], 'strax_tutorials')
