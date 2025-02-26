@@ -129,7 +129,7 @@ There are several arguments you can pass to
 usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
                         [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
-                        [--copy_tutorials]
+                        [--copy_tutorials] [--debug_interpreter]
 
 Start a strax jupyter notebook server on the dali batch queue
 
@@ -156,6 +156,8 @@ optional arguments:
   --notebook_dir NOTEBOOK_DIR
                         The working directory passed to jupyter
   --copy_tutorials      Copy tutorials to ~/strax_tutorials (if it does not exist)
+  --debug_interpreter   Display detailed information about Python interpreter selection
+
 
 ```
 
