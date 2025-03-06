@@ -4,6 +4,15 @@
 debug_interpreter=false
 args=()
 
+# Check if we're in a sourced environment with CVMFS Python
+current_python=$(which python 2>/dev/null)
+if [[ "$current_python" == *"/cvmfs/"* ]]; then
+    echo "ERROR: Don't launch  jupyter notebooks within a sourced environment - it may mess up the package paths :("
+    echo "Your current Python ($current_python) is from a /cvmfs path."
+    echo "Please open a new terminal and try again."
+    exit 1
+fi
+
 # Process command line arguments
 for arg in "$@"; do
     if [[ "$arg" == "--debug_interpreter" || "$arg" == "--debug_interpreter=true" || "$arg" == "--debug_interpreter=True" ]]; then
@@ -22,6 +31,14 @@ fi
 check_version() {
     local interpreter=$1
     if [ -x "$interpreter" ]; then
+        # Check if the interpreter path contains /cvmfs
+        if [[ "$interpreter" == *"/cvmfs/"* ]]; then
+            if [ "$debug_interpreter" = true ]; then
+                echo "✗ $interpreter - CONTAINS /cvmfs PATH - NOT ALLOWED"
+            fi
+            return 1
+        fi
+        
         # Try to get the version directly, with a simpler format
         local version_output=$($interpreter -c "import sys; print('{} {}'.format(sys.version_info.major, sys.version_info.minor))" 2>/dev/null)
         if [ $? -eq 0 ]; then
@@ -67,7 +84,6 @@ fi
 specific_paths=(
     "/usr/bin/python3"
     "/dali/lgrandi/strax/miniconda3/envs/strax/bin/python"
-    "/cvmfs/xenon.opensciencegrid.org/releases/nT/development/anaconda/envs/XENONnT_development/bin/python"
 )
 
 for path in "${specific_paths[@]}"; do
@@ -111,6 +127,13 @@ fi
 # Exit if no suitable interpreter was found
 if [ -z "$selected_interpreter" ]; then
     echo "ERROR: No suitable Python 3.6+ interpreter found. Exiting."
+    exit 1
+fi
+
+# Final check for /cvmfs in path (in case it somehow slipped through)
+if [[ "$selected_interpreter" == *"/cvmfs/"* ]]; then
+    echo "ERROR: Don't source any environment in the terminal when you want to start a jupyter notebook."
+    echo "The selected interpreter ($selected_interpreter) contains a /cvmfs path."
     exit 1
 fi
 
