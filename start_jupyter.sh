@@ -7,7 +7,11 @@ args=()
 # Check if we're in a sourced environment with CVMFS Python
 current_python=$(which python 2>/dev/null)
 if [[ "$current_python" == *"/cvmfs/"* ]]; then
+<<<<<<< HEAD
     echo "ERROR: Don't launch  jupyter notebooks within a sourced environment - it may mess up the package paths :("
+=======
+    echo "ERROR: Don't launch jupyter notebooks within a cvmfs environment - it may mess up the package paths :("
+>>>>>>> 318fb1a44de9af2c0edc910ad56c8c0096705602
     echo "Your current Python ($current_python) is from a /cvmfs path."
     echo "Please open a new terminal and try again."
     exit 1
@@ -34,7 +38,7 @@ check_version() {
         # Check if the interpreter path contains /cvmfs
         if [[ "$interpreter" == *"/cvmfs/"* ]]; then
             if [ "$debug_interpreter" = true ]; then
-                echo "✗ $interpreter - CONTAINS /cvmfs PATH - NOT ALLOWED"
+                echo "Error: $interpreter - CONTAINS /cvmfs PATH - NOT ALLOWED"
             fi
             return 1
         fi
