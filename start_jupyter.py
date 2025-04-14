@@ -40,6 +40,7 @@ def _get_lc_nodes(partition: str) -> List[str]:
 
 # check which machine I am on
 hostname = socket.gethostname()
+full_hostname = hostname.replace(".rcc.local", ".rcc.uchicago.edu")
 # automatically set default partition based on hostname
 if 'midway3' in hostname:
     default_partition = 'lgrandi'
@@ -141,11 +142,11 @@ jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST --notebook-dir {n
 SUCCESS_MESSAGE = """
 All done! If you have linux, execute this command on your laptop:
 
-ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && sensible-browser http://localhost:{port}/{token}
+ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && sensible-browser http://localhost:{port}/{token}
 
 If you have a mac, instead do:
 
-ssh -fN -L {port}:{ip}:{port} {username}@dali-login2.rcc.uchicago.edu && open "http://localhost:{port}/{token}"
+ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && open "http://localhost:{port}/{token}"
 
 Happy strax analysis, {username}!
 """
@@ -426,7 +427,7 @@ def main():
         for job in jobs:
             print_flush("\t" + job)
 
-    print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username))
+    print_flush(SUCCESS_MESSAGE.format(ip=ip, port=port, token=token, username=username, hostname=full_hostname))
 
 
 def print_flush(x):
