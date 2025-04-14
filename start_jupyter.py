@@ -148,6 +148,10 @@ If you have a mac, instead do:
 
 ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && open "http://localhost:{port}/{token}"
 
+To connect to any web-based service (including VSCode Server), use the following URL format in your browser:
+
+https://{ip}:{port}
+
 Happy strax analysis, {username}!
 """
 
