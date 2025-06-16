@@ -83,7 +83,7 @@ fi
 # Check specific paths that might have newer Python versions
 specific_paths=(
     "/usr/bin/python3"
-    "/dali/lgrandi/strax/miniconda3/envs/strax/bin/python"
+    # "/dali/lgrandi/strax/miniconda3/envs/strax/bin/python"
 )
 
 for path in "${specific_paths[@]}"; do
