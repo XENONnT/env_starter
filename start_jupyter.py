@@ -150,7 +150,7 @@ ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && open "http://localhost:{p
 
 To connect to any web-based service (including VSCode Server), use the following URL format in your browser:
 
-https://{ip}:{port}
+http://{ip}:{port}
 
 Happy strax analysis, {username}!
 """
