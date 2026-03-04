@@ -116,7 +116,7 @@ What this does is setup an ssh tunnel between the machine you run those commands
 This script submits jobs to the midway cluster and so must be executed on midway itself. However, it is convenient to execute it over ssh *from your personal machine*:
 
 ```
-ssh {username}@dali.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.sh
+ssh {username}@midway3.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.sh
 ```
 
 You should then see the output as above and then be able to access the notebook. 
@@ -131,12 +131,12 @@ usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--n
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
                         [--copy_tutorials] [--debug_interpreter]
 
-Start a strax jupyter notebook server on the dali batch queue
+Start a strax jupyter notebook server on the batch queue
 
 optional arguments:
   -h, --help            show this help message and exit
   --partition PARTITION
-                        RCC/DALI partition to use. Try dali, broadwl, or xenon1t.
+                        RCC/DALI partition to use. Try dali, broadwl, or xenon1t, or lgrandi on midway3
   --bypass_reservation  Do not use the notebook reservation (useful if it is full)
   --node NODE           Specify a node, if desired. By default no specification made
   --timeout TIMEOUT     Seconds to wait for the jupyter server to start
