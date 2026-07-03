@@ -142,7 +142,11 @@ jupyter {jupyter} --no-browser --port=$JUP_PORT --ip=$JUP_HOST --notebook-dir {n
 SUCCESS_MESSAGE = """
 All done! If you have linux, execute this command on your laptop:
 
-ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && sensible-browser http://localhost:{port}/{token}
+ssh -fN -L {port}:{ip}:{port} {username}@{hostname} && sensible-browser "http://localhost:{port}/{token}"
+
+If you have a windows powershell, instead do (open browser manually if it doesn't prompt):
+
+ssh -N -L {port}:{ip}:{port} {username}@{hostname}; Start-Process "http://localhost:{port}/{token}"
 
 If you have a mac, instead do:
 
