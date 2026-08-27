@@ -314,12 +314,14 @@ def tunnel_command(url, username, alias=None):
     if alias:
         return (
         f'\n\tFor linux: ssh -fN -L {port}:{parsed.hostname}:{port} {alias} && sensible-browser "{local_url}\n\n'
-        f'\tFor macOS: ssh -fN -L {port}:{parsed.hostname}:{port} {alias} && open "{local_url}"\n'
+        f'\tFor macOS: ssh -fN -L {port}:{parsed.hostname}:{port} {alias} && open "{local_url}"\n\n'
+        f'\tFor Windows: ssh -fN -L {port}:{parsed.hostname}:{port} {alias}; Start-Process "{local_url}"\n'
         )
     else:
         return (
             f'\n\tFor linux: ssh -fN -L {port}:{parsed.hostname}:{port} {username}@{full_hostname} && sensible-browser "{local_url}\n\n'
-            f'\tFor macOS: ssh -fN -L {port}:{parsed.hostname}:{port} {username}@{full_hostname} && open "{local_url}"\n'
+            f'\tFor macOS: ssh -fN -L {port}:{parsed.hostname}:{port} {username}@{full_hostname} && open "{local_url}"\n\n'
+            f'\tFor Windows: ssh -fN -L {port}:{parsed.hostname}:{port} {username}@{full_hostname}; Start-Process "{local_url}"\n'
         )
 
 
