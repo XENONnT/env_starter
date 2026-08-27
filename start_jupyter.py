@@ -411,6 +411,10 @@ All done! If you have linux, execute this command on your laptop:
 
 ssh -fN -L {port}:{ip}:{port} {user_host_name} && sensible-browser http://localhost:{port}/{token}
 
+If you have a windows powershell, instead do (open browser manually if it doesn't prompt):
+
+ssh -N -L {port}:{ip}:{port} {user_host_name}; Start-Process "http://localhost:{port}/{token}"
+
 If you have a mac, instead do:
 
 ssh -fN -L {port}:{ip}:{port} {user_host_name} && open "http://localhost:{port}/{token}"

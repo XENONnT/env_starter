@@ -28,7 +28,7 @@ Login to midway/dali. For directions on getting accounts
 setup etc, see [here](https://xe1t-wiki.lngs.infn.it/doku.php?id=xenon:xenon1t:cmp:computing:midway_cluster:instructions). 
 
 ```
-ssh {username}@dali-login1.rcc.uchicago.edu
+ssh {username}@midway3.rcc.uchicago.edu
 ```
 
 Decide where you would like to put the env_starter 
@@ -116,7 +116,7 @@ What this does is setup an ssh tunnel between the machine you run those commands
 This script submits jobs to the midway cluster and so must be executed on midway itself. However, it is convenient to execute it over ssh *from your personal machine*:
 
 ```
-ssh {username}@dali.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.sh
+ssh {username}@midway3.rcc.uchicago.edu /path/to/your/env_starter/env_starter/start_jupyter.sh
 ```
 
 You should then see the output as above and then be able to access the notebook. 
@@ -131,12 +131,12 @@ usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--n
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
                         [--copy_tutorials] [--debug_interpreter] [--list] [--rcc_alias]
 
-Start a strax jupyter notebook server on the dali batch queue
+Start a strax jupyter notebook server on the batch queue
 
 optional arguments:
   -h, --help            show this help message and exit
   --partition PARTITION
-                        RCC/DALI partition to use. Try dali, broadwl, or xenon1t.
+                        RCC/DALI partition to use. Try dali, broadwl, or xenon1t, or lgrandi on midway3
   --bypass_reservation  Do not use the notebook reservation (useful if it is full)
   --node NODE           Specify a node, if desired. By default no specification made
   --exclude_nodes       Nodes to exclude in situations where we know there is a specific or many compute nodes not working
