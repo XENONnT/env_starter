@@ -126,10 +126,10 @@ There are several arguments you can pass to
 `start_jupyter.sh` to customize your job. 
 
 ```
-usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE]
+usage: start_jupyter.sh [-h] [--partition PARTITION] [--bypass_reservation] [--node NODE] [--exclude_nodes]
                         [--timeout TIMEOUT] [--cpu CPU] [--ram RAM] [--gpu] [--env {singularity,cvmfs}]
                         [--tag TAG] [--force_new] [--jupyter {lab,notebook}] [--notebook_dir NOTEBOOK_DIR]
-                        [--copy_tutorials] [--debug_interpreter]
+                        [--copy_tutorials] [--debug_interpreter] [--list] [--rcc_alias]
 
 Start a strax jupyter notebook server on the batch queue
 
@@ -139,6 +139,7 @@ optional arguments:
                         RCC/DALI partition to use. Try dali, broadwl, or xenon1t, or lgrandi on midway3
   --bypass_reservation  Do not use the notebook reservation (useful if it is full)
   --node NODE           Specify a node, if desired. By default no specification made
+  --exclude_nodes       Nodes to exclude in situations where we know there is a specific or many compute nodes not working
   --timeout TIMEOUT     Seconds to wait for the jupyter server to start
   --cpu CPU             Number of CPUs to request.
   --ram RAM             MB of RAM to request
@@ -157,6 +158,8 @@ optional arguments:
                         The working directory passed to jupyter
   --copy_tutorials      Copy tutorials to ~/strax_tutorials (if it does not exist)
   --debug_interpreter   Display detailed information about Python interpreter selection
+  --list                Prints the basic information: (node, container, url, ...) of all the jobs currently running
+  --rcc_alias           Instead of printing "user@hostname", use print your local alias registered in .ssh.
 
 
 ```
@@ -262,7 +265,7 @@ involves one extra step. First, make the alias in your
 `~/.bashrc`, which for me looked like this: 
 
 ``` 
-alias start_notebook="/home/ershockley/nt/computing/env_starter/start_jupyter.sh"
+alias start_notebook="/path/to/your/env_starter/start_jupyter.sh"
 ```
 But in order for this to run via ssh you also need to 
 add this to *the very top of* your `.bashrc`:
@@ -277,6 +280,16 @@ After this, you should then be able to run something like:
 ``` 
 Evans-MacBook-Air:~ shocks$ ssh dali start_notebook --container xenonnt-2021.07.1.simg
 ```
+
+Another alias that could be useful is:
+
+``` 
+alias list_jupyter_jobs="/path/to/your/env_starter/start_jupyter.sh --list"
+``` 
+This way you can retrieve the url and the container that each url corresponds to.
+
+One more tip would be to set the default of "--rcc_alias" to your ssh alias in the start_jupyter.py ~ line 489. Then you don't need to
+use the flag --alias everytime you want to open a notebook or check the urls.
 
 
 ### Further Customization
