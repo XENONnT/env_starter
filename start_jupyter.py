@@ -349,7 +349,7 @@ def list_straxlab_jobs(partition, alias):
             print_flush('\tURL not available yet.')
             continue
 
-        print_flush(f'\tURL: {url}')
+        print_flush(f'\tParser: {url}')
         command = tunnel_command(url, username, alias)
         if command is not None:
             print_flush('\tOpen from your laptop with:')
@@ -493,7 +493,7 @@ def parse_arguments():
                         default=None,
                         help='Enter the path of your xenon_config file if you want to replace the public one.')
     parser.add_argument('--rcc_alias',
-                        default=None,
+                        default='midway3',
                         help='Set the alias for your RCC account to by pass two-factor authentication when opening the jupyter notebooks')
 
     return parser.parse_args()
