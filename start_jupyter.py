@@ -349,7 +349,7 @@ def list_straxlab_jobs(partition, alias):
             print_flush('\tURL not available yet.')
             continue
 
-        print_flush(f'\tURL: {url}')
+        print_flush(f'\tParser: {url}')
         command = tunnel_command(url, username, alias)
         if command is not None:
             print_flush('\tOpen from your laptop with:')
